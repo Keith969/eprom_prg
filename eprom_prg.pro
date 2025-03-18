@@ -1,5 +1,5 @@
 TEMPLATE = app
-TARGET = 2708prg
+TARGET = eprom_prg
 DESTDIR = .
 
 QT += core gui widgets serialport
