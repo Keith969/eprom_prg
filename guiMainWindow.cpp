@@ -320,6 +320,13 @@ guiMainWindow::init()
             }
             else {
                 appendText(QString("Incorrect device type %1").arg(response));
+                m_initOK = false;
+                m_serialPort->close();
+                // Disable the buttons
+                ui.checkButton->setEnabled(false);
+                ui.readButton->setEnabled(false);
+                ui.writeButton->setEnabled(false);
+                ui.verifyButton->setEnabled(false);
             }
         } else {
             serialTimeout(QString("Wait read response timeout %1").arg(QTime::currentTime().toString()));

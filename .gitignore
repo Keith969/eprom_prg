@@ -1,0 +1,5 @@
+.qmake.stash
+GeneratedFiles/*
+Makefile
+eprom_prg.pro.user
+release/*
