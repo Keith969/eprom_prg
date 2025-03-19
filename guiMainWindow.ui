@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>8755 Programmer</string>
+   <string>EPROM Programmer</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -192,6 +192,11 @@
              <property name="toolTip">
               <string>Set the type of the EPROM</string>
              </property>
+             <item>
+              <property name="text">
+               <string>2716</string>
+              </property>
+             </item>
              <item>
               <property name="text">
                <string>2708</string>

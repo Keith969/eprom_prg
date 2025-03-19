@@ -286,7 +286,7 @@ guiMainWindow::init()
                     statusBar()->showMessage("Initialise OK");
                 }
                 else {
-                    serialError(QString("Failed to initialise serial link to % baud").arg(baudRate));
+                    serialError(QString("Failed to initialise serial link to %1 baud").arg(baudRate));
                 }
             } else {
                 serialTimeout(QString("Wait read response timeout %1").arg(QTime::currentTime().toString()));
@@ -545,7 +545,7 @@ guiMainWindow::write()
             appendText(QString("Write complete!"));
         }
 
-        else if (devType == "2708") {
+        else if (devType == "2708" || devType == "2716") {
 
             // Repeat write 100 times...
             for (int32_t j=0; j < 100; ++j) {
