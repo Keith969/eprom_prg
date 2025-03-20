@@ -90,6 +90,10 @@ guiMainWindow::guiMainWindow(QWidget *parent)
 guiMainWindow::~guiMainWindow()
 {
     delete m_HexFile;
+    if (m_serialPort) {
+        m_serialPort->close();
+        delete m_serialPort;
+    }
 }
 
 // *****************************************************************************
@@ -281,9 +285,6 @@ guiMainWindow::init()
                 ui.readButton->setEnabled(true);
                 ui.writeButton->setEnabled(true);
                 ui.verifyButton->setEnabled(true);
-
-                // Hide the setup msg
-                ui.setupLabel->hide();
 
                 if (ok == true) {
                     statusBar()->showMessage("Initialise OK");
