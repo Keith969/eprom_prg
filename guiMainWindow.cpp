@@ -282,6 +282,9 @@ guiMainWindow::init()
                 ui.writeButton->setEnabled(true);
                 ui.verifyButton->setEnabled(true);
 
+                // Hide the setup msg
+                ui.setupLabel->hide();
+
                 if (ok == true) {
                     statusBar()->showMessage("Initialise OK");
                 }
