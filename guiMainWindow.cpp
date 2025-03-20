@@ -687,6 +687,13 @@ guiMainWindow::write()
 
         else if (devType == "2732") {
 
+            // Check hex file size is 4kb
+            if (m_HexFile->size() != 4096) {
+                clearText();
+                appendText("HEX file size is not 2048 bytes!\n");
+                return;
+            }
+
             statusBar()->showMessage(QString("Writing..."));
             appendText(QString("Writing to DUT"));
             qApp->processEvents();
