@@ -488,6 +488,13 @@ guiMainWindow::write()
 
         if (devType == "8755") {
 
+            // Check hex file size is 2kb
+            if (m_HexFile->size() != 2048) {
+                clearText();
+                appendText("HEX file size is not 2048 bytes!\n");
+                return;
+            }
+
             statusBar()->showMessage("Writing...");
             clearText();
             appendText("Writing data to DUT...");
@@ -546,6 +553,13 @@ guiMainWindow::write()
         }
 
         else if (devType == "2708") {
+
+            // Check hex file size is 1kb
+            if (m_HexFile->size() != 1024) {
+                clearText();
+                appendText("HEX file size is not 2048 bytes!\n");
+                return;
+            }
 
             // Repeat write 100 times...
             for (int32_t j=0; j < 100; ++j) {
@@ -607,6 +621,13 @@ guiMainWindow::write()
         }
 
         else if (devType == "2716") {
+
+            // Check hex file size is 2kb
+            if (m_HexFile->size() != 2048) {
+                clearText();
+                appendText("HEX file size is not 2048 bytes!\n");
+                return;
+            }
 
             statusBar()->showMessage(QString("Writing..."));
             appendText(QString("Writing to DUT"));
