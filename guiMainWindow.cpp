@@ -220,6 +220,9 @@ guiMainWindow::init()
     int32_t baudRate = ui.baudRate->currentText().toInt();
     int32_t flowControl = getFlowControl();
     QString devType = ui.deviceType->currentText();
+    devType.remove("TMS");
+    devType.remove("i");
+    m_devType = devType;
 
     if (m_initOK) {
         QMessageBox::warning(this, "Initialisation", "Serial link already set up!", QMessageBox::Ok);
@@ -319,7 +322,7 @@ guiMainWindow::init()
             }
 
             const QString response = QString::fromUtf8(responseData);
-            if (devType == response) {
+            if (m_devType == response) {
                 appendText(QString("Found correct device type %1.").arg(response));
             }
             else {
@@ -404,7 +407,6 @@ guiMainWindow::check()
         return;
     }
 
-    QString devType = ui.deviceType->currentText();
     int32_t timeout = ui.timeOut->value() * 1000;
     statusBar()->showMessage(QString("Status: Connected to port %1.")
                                  .arg(m_serialPort->portName()));
@@ -482,7 +484,6 @@ guiMainWindow::write()
         return;
     }
     if (m_HexFile->size() > 0) {
-        QString devType = ui.deviceType->currentText();
         int32_t timeout = ui.timeOut->value() * 1000;
         statusBar()->showMessage(QString("Status: Connected to port %1.")
                                      .arg(m_serialPort->portName()));
@@ -490,7 +491,7 @@ guiMainWindow::write()
         setLedColour(Qt::red);
         qApp->processEvents();
 
-        if (devType == "8755") {
+        if (m_devType == "8755") {
 
             // Check hex file size is 2kb
             if (m_HexFile->size() != 2048) {
@@ -556,7 +557,7 @@ guiMainWindow::write()
             appendText(QString("Write complete!"));
         }
 
-        else if (devType == "2708") {
+        else if (m_devType == "2708") {
 
             // Check hex file size is 1kb
             if (m_HexFile->size() != 1024) {
@@ -624,7 +625,7 @@ guiMainWindow::write()
             appendText(QString("Write complete!"));
         }
 
-        else if (devType == "2716") {
+        else if (m_devType == "2716") {
 
             // Check hex file size is 2kb
             if (m_HexFile->size() != 2048) {
@@ -689,7 +690,7 @@ guiMainWindow::write()
             appendText(QString("Write complete!"));
         }
 
-        else if (devType == "2732") {
+        else if (m_devType == "2732") {
 
             // Check hex file size is 4kb
             if (m_HexFile->size() != 4096) {

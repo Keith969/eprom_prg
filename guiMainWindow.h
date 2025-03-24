@@ -71,6 +71,9 @@ private:
     QLedWidget           * m_ledWidget;
 
     bool                   m_initOK;
+
+    // Device type
+    QString                m_devType;
 };
 
 #endif /* GUIMAINWINDOW_H */
