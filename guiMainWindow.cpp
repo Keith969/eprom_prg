@@ -690,7 +690,7 @@ guiMainWindow::write()
             appendText(QString("Write complete!"));
         }
 
-        else if (m_devType == "2732") {
+        else if (m_devType == "2732" || m_devType == "2532") {
 
             // Check hex file size is 4kb
             if (m_HexFile->size() != 4096) {
