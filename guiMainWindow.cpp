@@ -561,7 +561,7 @@ guiMainWindow::write()
             // Check hex file size is 1kb
             if (m_HexFile->size() != 1024) {
                 clearText();
-                appendText("HEX file size is not 2048 bytes!\n");
+                appendText("HEX file size is not 1024 bytes!\n");
                 return;
             }
 
@@ -694,7 +694,7 @@ guiMainWindow::write()
             // Check hex file size is 4kb
             if (m_HexFile->size() != 4096) {
                 clearText();
-                appendText("HEX file size is not 2048 bytes!\n");
+                appendText("HEX file size is not 4096 bytes!\n");
                 return;
             }
 

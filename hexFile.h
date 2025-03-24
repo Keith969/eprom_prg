@@ -25,7 +25,7 @@ public:
         m_Checksum(0) {}
     ~hexDataChunk() {}
 
-    uint8_t                   byteCount() const;
+    uint8_t                   byteCount();
     void                      setByteCount(uint8_t n);
     uint8_t                   recordType() const;
     void                      setRecordType(uint8_t n);

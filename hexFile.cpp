@@ -14,8 +14,8 @@
 // Function     [ byteCount ]
 // Description  [ ]
 // *****************************************************************************
- uint8_t
-hexDataChunk::byteCount() const
+uint8_t
+hexDataChunk::byteCount()
 {
     return m_ByteCount;
 }
@@ -132,12 +132,18 @@ hexFile::mainWindow()
 
 // *****************************************************************************
 // Function     [ size ]
-// Description  [ ]
+// Description  [ Get the size of the hex file in bytes ]
 // *****************************************************************************
 size_t
 hexFile::size()
 {
-    return m_HexData.size();
+    size_t result=0;
+    for (auto iter = m_HexData.begin(); iter != m_HexData.end(); ++iter) {
+        hexDataChunk chunk = *iter;
+        result += chunk.byteCount();
+
+    }
+    return result;
 }
 
 // *****************************************************************************
