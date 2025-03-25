@@ -81,6 +81,8 @@ guiMainWindow::guiMainWindow(QWidget *parent)
     ui.readButton->setEnabled(false);
     ui.writeButton->setEnabled(false);
     ui.verifyButton->setEnabled(false);
+
+    m_serialPort = nullptr;
 }
 
 // *****************************************************************************

@@ -191,6 +191,7 @@ hexFile::readHex(const QString& hexFileName)
         uint32_t lineNum = 0;
         bool ok = true;
         QString s;
+        m_HexData.clear();
 
         while (!fi.atEnd()) {
             hexDataChunk chunk;
