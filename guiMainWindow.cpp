@@ -306,36 +306,43 @@ guiMainWindow::init()
     }
 
 
-    // Now send a device identity cmd
-    m_serialPort->write(CMD_IDEN);
+    // Now send a device type cmd
+    if (devType == "2716" || devType == "2732" || devType == "2532") {
 
-    // Did we get a response?
-    if (m_serialPort->waitForBytesWritten(timeout)) {
+        // Write the cmd
+        m_serialPort->write(CMD_TYPE);
 
-        // read response from the PIC
+        // Send the cmd arg
+        QByteArray requestData;
+        if (devType == "2716")
+            requestData = QString("0").toUtf8();
+        else if (devType == "2732")
+            requestData = QString("1").toUtf8();
+        else if (devType == "2532")
+            requestData = QString("2").toUtf8();
+
+        m_serialPort->write(requestData);
+
+
+        // Read response from the PIC
         if (m_serialPort->waitForReadyRead(timeout)) {
 
-            // Try and read some data
             QByteArray responseData = m_serialPort->readAll();
 
-            // ... and wait for rest of the data.
             while (m_serialPort->waitForReadyRead(10)) {
                 responseData += m_serialPort->readAll();
             }
-
             const QString response = QString::fromUtf8(responseData);
-            if (m_devType == response) {
-                appendText(QString("Found correct device type %1.").arg(response));
+            if (response == "OK") {
+                statusBar()->showMessage("Write OK");
             }
             else {
-                appendText(QString("Found incorrect device type %1.").arg(response));
-                appendText(QString("Please set correct device and redo init."));
+                serialError(QString("Failed to write %1 bytes)").arg(requestData.size()));
             }
         } else {
             serialTimeout(QString("Wait read response timeout %1").arg(QTime::currentTime().toString()));
         }
-    } else {
-        serialTimeout(QString("Wait write request timeout %1").arg(QTime::currentTime().toString()));
+        appendText(QString("Write device type complete!"));
     }
 
     setLedColour(Qt::green);

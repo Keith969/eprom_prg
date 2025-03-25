@@ -18,6 +18,7 @@
 #define CMD_WRTE "$2"
 #define CMD_CHEK "$3"
 #define CMD_IDEN "$4"
+#define CMD_TYPE "$5"
 #define CMD_INIT "U"
 
 
