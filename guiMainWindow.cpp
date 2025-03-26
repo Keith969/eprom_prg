@@ -298,10 +298,10 @@ guiMainWindow::init()
                     serialError(QString("Failed to initialise serial link to %1 baud").arg(baudRate));
                 }
             } else {
-                serialTimeout(QString("Wait read response timeout %1").arg(QTime::currentTime().toString()));
+                serialTimeout(QString("Read baud rate timeout %1").arg(QTime::currentTime().toString()));
             }
         } else {
-            serialTimeout(QString("Wait write request timeout %1").arg(QTime::currentTime().toString()));
+            serialTimeout(QString("Send init brg timeout %1").arg(QTime::currentTime().toString()));
         }
     }
 
@@ -340,9 +340,9 @@ guiMainWindow::init()
                 serialError(QString("Failed to write %1 bytes)").arg(requestData.size()));
             }
         } else {
-            serialTimeout(QString("Wait read response timeout %1").arg(QTime::currentTime().toString()));
+            serialTimeout(QString("Read devType timeout %1").arg(QTime::currentTime().toString()));
         }
-        appendText(QString("Write device type complete!"));
+        appendText(QString("Set device type to %1").arg(devType));
     }
 
     setLedColour(Qt::green);
@@ -395,10 +395,10 @@ guiMainWindow::read()
                 serialError(QString("Failed to read reponse (%1 bytes read)").arg(response.size()));
             }
         } else {
-            serialTimeout(QString("Wait read response timeout %1").arg(QTime::currentTime().toString()));
+            serialTimeout(QString("Read cmd response timeout %1").arg(QTime::currentTime().toString()));
         }
     } else {
-        serialTimeout(QString("Wait cmd write timeout %1").arg(QTime::currentTime().toString()));
+        serialTimeout(QString("Send Read cmd timeout %1").arg(QTime::currentTime().toString()));
     }
 
     setLedColour(Qt::green);
@@ -472,10 +472,10 @@ guiMainWindow::check()
                 appendText(QString("Blank check failed for %1 bytes").arg(fails));
             }
         } else {
-            serialTimeout(QString("Wait read response timeout %1").arg(QTime::currentTime().toString()));
+            serialTimeout(QString("Check cmd response timeout %1").arg(QTime::currentTime().toString()));
         }
     } else {
-        serialTimeout(QString("Wait cmd write timeout %1").arg(QTime::currentTime().toString()));
+        serialTimeout(QString("Send check cmd timeout %1").arg(QTime::currentTime().toString()));
     }
 
     setLedColour(Qt::green);
@@ -561,7 +561,7 @@ guiMainWindow::write()
                     serialError(QString("Failed to write %1 bytes)").arg(requestData.size()));
                 }
             } else {
-                serialTimeout(QString("Wait read response timeout %1").arg(QTime::currentTime().toString()));
+                serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
             }
             appendText(QString("Write complete!"));
         }
@@ -628,7 +628,7 @@ guiMainWindow::write()
                         serialError(QString("Failed to write %1 bytes)").arg(byte_count));
                     }
                 } else {
-                    serialTimeout(QString("Write read response timeout %1").arg(QTime::currentTime().toString()));
+                    serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
                 }
             }
             appendText(QString("Write complete!"));
@@ -693,7 +693,7 @@ guiMainWindow::write()
                     serialError(QString("Failed to write %1 bytes)").arg(byte_count));
                 }
             } else {
-                serialTimeout(QString("Write read response timeout %1").arg(QTime::currentTime().toString()));
+                serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
             }
 
             appendText(QString("Write complete!"));
@@ -758,7 +758,7 @@ guiMainWindow::write()
                     serialError(QString("Failed to write %1 bytes)").arg(byte_count));
                 }
             } else {
-                serialTimeout(QString("Write read response timeout %1").arg(QTime::currentTime().toString()));
+                serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
             }
 
             appendText(QString("Write complete!"));
@@ -857,10 +857,10 @@ guiMainWindow::verify()
                 serialError("Failed to read from serial link");
             }
         } else {
-            serialTimeout(QString("Wait read response timeout %1").arg(QTime::currentTime().toString()));
+            serialTimeout(QString("Verify response timeout %1").arg(QTime::currentTime().toString()));
         }
     } else {
-        serialTimeout(QString("Wait cmd write timeout %1").arg(QTime::currentTime().toString()));
+        serialTimeout(QString("Verify cmd write timeout %1").arg(QTime::currentTime().toString()));
     }
 
     setLedColour(Qt::green);
