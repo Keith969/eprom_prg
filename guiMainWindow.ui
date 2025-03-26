@@ -194,22 +194,27 @@
              </property>
              <item>
               <property name="text">
-               <string>TMS2532</string>
+               <string>2532</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>i2716</string>
+               <string>2732</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>i2708</string>
+               <string>2716</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>i8755</string>
+               <string>2708</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>8755</string>
               </property>
              </item>
             </widget>
