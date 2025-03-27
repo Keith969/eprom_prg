@@ -219,12 +219,10 @@ guiMainWindow::getFlowControl()
 void
 guiMainWindow::reset()
 {
-    statusBar()->showMessage("Resetting programmer");
-    clearText();
-
     // Send the PIC a reset cmd
     m_serialPort->write(CMD_RSET);
     m_serialPort->flush();
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
     m_initOK = false;
 
     // Until we have init the baud rate, disable the buttons
@@ -233,12 +231,14 @@ guiMainWindow::reset()
     ui.writeButton->setEnabled(false);
     ui.verifyButton->setEnabled(false);
     ui.resetButton->setEnabled(false);
+    ui.initButton->setEnabled(true);
 
     if (m_serialPort) {
         m_serialPort->close();
         delete m_serialPort;
         m_serialPort = nullptr;
     }
+    clearText();
     statusBar()->showMessage("Ready");
 }
 
@@ -320,6 +320,7 @@ guiMainWindow::init()
                 ui.readButton->setEnabled(true);
                 ui.writeButton->setEnabled(true);
                 ui.verifyButton->setEnabled(true);
+                ui.initButton->setEnabled(false);
 
                 if (ok == true) {
                     statusBar()->showMessage("Initialise OK");
