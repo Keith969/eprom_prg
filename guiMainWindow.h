@@ -19,6 +19,7 @@
 #define CMD_CHEK "$3"
 #define CMD_IDEN "$4"
 #define CMD_TYPE "$5"
+#define CMD_RSET "$9"
 #define CMD_INIT "U"
 
 
@@ -43,6 +44,7 @@ public slots:
     void                   check();
     void                   write();
     void                   verify();
+    void                   reset();
 
     void                   serialError(const QString &);
     void                   serialTimeout(const QString &);

@@ -80,6 +80,16 @@
             </spacer>
            </item>
            <item>
+            <widget class="QPushButton" name="resetButton">
+             <property name="toolTip">
+              <string>Reset the programmer</string>
+             </property>
+             <property name="text">
+              <string>Reset</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QPushButton" name="initButton">
              <property name="toolTip">
               <string>Initialise the serial link at the given baud rate.</string>
@@ -113,6 +123,9 @@
               </property>
               <item>
                <widget class="QRadioButton" name="flowNone">
+                <property name="toolTip">
+                 <string>Do not use flow control</string>
+                </property>
                 <property name="text">
                  <string>None</string>
                 </property>
@@ -120,6 +133,9 @@
               </item>
               <item>
                <widget class="QRadioButton" name="flowRtsCts">
+                <property name="toolTip">
+                 <string>Use RTS/CTS handshaking</string>
+                </property>
                 <property name="text">
                  <string>RTS/CTS</string>
                 </property>
@@ -153,6 +169,9 @@
            </item>
            <item>
             <widget class="QSpinBox" name="timeOut">
+             <property name="toolTip">
+              <string>Timeout when communicating</string>
+             </property>
              <property name="suffix">
               <string>s</string>
              </property>

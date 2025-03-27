@@ -38,6 +38,7 @@ guiMainWindow::guiMainWindow(QWidget *parent)
     QObject::connect(ui.checkButton,         SIGNAL(pressed()),                  this, SLOT(check()));
     QObject::connect(ui.writeButton,         SIGNAL(pressed()),                  this, SLOT(write()));
     QObject::connect(ui.verifyButton,        SIGNAL(pressed()),                  this, SLOT(verify()));
+    QObject::connect(ui.resetButton,         SIGNAL(pressed()),                  this, SLOT(reset()));
     QObject::connect(ui.loadHexFile,         SIGNAL(clicked()),                  this, SLOT(openHexFile()));
     QObject::connect(ui.saveHexFile,         SIGNAL(clicked()),                  this, SLOT(saveHexFile()));
 
@@ -81,6 +82,7 @@ guiMainWindow::guiMainWindow(QWidget *parent)
     ui.readButton->setEnabled(false);
     ui.writeButton->setEnabled(false);
     ui.verifyButton->setEnabled(false);
+    ui.resetButton->setEnabled(false);
 
     m_serialPort = nullptr;
 }
@@ -208,6 +210,36 @@ guiMainWindow::getFlowControl()
         return 0;
     /*else if (ui.flowRtsCts->isChecked())*/
         return 1;
+}
+
+// *****************************************************************************
+// Function     [ reset ]
+// Description  [ Reset the programmer ]
+// *****************************************************************************
+void
+guiMainWindow::reset()
+{
+    statusBar()->showMessage("Resetting programmer");
+    clearText();
+
+    // Send the PIC a reset cmd
+    m_serialPort->write(CMD_RSET);
+    m_serialPort->flush();
+    m_initOK = false;
+
+    // Until we have init the baud rate, disable the buttons
+    ui.checkButton->setEnabled(false);
+    ui.readButton->setEnabled(false);
+    ui.writeButton->setEnabled(false);
+    ui.verifyButton->setEnabled(false);
+    ui.resetButton->setEnabled(false);
+
+    if (m_serialPort) {
+        m_serialPort->close();
+        delete m_serialPort;
+        m_serialPort = nullptr;
+    }
+    statusBar()->showMessage("Ready");
 }
 
 // *****************************************************************************
@@ -343,6 +375,7 @@ guiMainWindow::init()
         appendText(QString("Set device type to %1").arg(m_devType));
     }
 
+    ui.resetButton->setEnabled(true);
     setLedColour(Qt::green);
 }
 
