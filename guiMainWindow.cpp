@@ -13,6 +13,11 @@
 #include <chrono>
 #include <thread>
 
+#define DEV_2716 0
+#define DEV_2732 1
+#define DEV_2532 2
+#define DEV_2708 3
+
 // *****************************************************************************
 // Function     [ constructor ]
 // Description  [ ]
@@ -338,12 +343,17 @@ guiMainWindow::init()
 
 
     // Now send a device type cmd
-    if (m_devType == "2716" || m_devType == "2732" || m_devType == "2532") {
+    if (m_devType == "2716" || m_devType == "2732" || m_devType == "2532" || m_devType == "2708") {
 
         // Write the cmd
         m_serialPort->write(CMD_TYPE);
 
-        // Send the cmd arg
+        // Send the cmd arg as per pic code
+        // DEV_2716 0
+        // DEV_2732 1
+        // DEV_2532 2
+        // DEV_2708 3
+
         QByteArray requestData;
         if (m_devType == "2716")
             requestData = QString("0").toUtf8();
@@ -351,6 +361,8 @@ guiMainWindow::init()
             requestData = QString("1").toUtf8();
         else if (m_devType == "2532")
             requestData = QString("2").toUtf8();
+        else if (m_devType == "2708")
+            requestData = QString("3").toUtf8();
 
         m_serialPort->write(requestData);
 
