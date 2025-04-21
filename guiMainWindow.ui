@@ -241,6 +241,11 @@
                <string>8755</string>
               </property>
              </item>
+             <item>
+              <property name="text">
+               <string>8748</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>

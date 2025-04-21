@@ -17,6 +17,9 @@
 #define DEV_2732 1
 #define DEV_2532 2
 #define DEV_2708 3
+#define DEV_T2716 4
+#define DEV_8755 5
+#define DEV_8748 6
 
 // *****************************************************************************
 // Function     [ constructor ]
@@ -343,7 +346,13 @@ guiMainWindow::init()
 
 
     // Now send a device type cmd
-    if (m_devType == "2716" || m_devType == "2732" || m_devType == "2532" || m_devType == "2708" || m_devType == "TMS2716") {
+    if (m_devType == "2716" ||
+        m_devType == "2732" ||
+        m_devType == "2532" ||
+        m_devType == "2708" ||
+        m_devType == "TMS2716" ||
+        m_devType == "8755" ||
+        m_devType == "8748") {
 
         // Write the cmd
         m_serialPort->write(CMD_TYPE);
@@ -353,6 +362,9 @@ guiMainWindow::init()
         // DEV_2732 1
         // DEV_2532 2
         // DEV_2708 3
+        // DEV_T2716 4
+        // DEV_8755 5
+        // DEV_8748 6
 
         QByteArray requestData;
         if (m_devType == "2716")
@@ -365,6 +377,10 @@ guiMainWindow::init()
             requestData = QString("3").toUtf8();
         else if (m_devType == "TMS2716")
             requestData = QString("4").toUtf8();
+        else if (m_devType == "8755")
+            requestData = QString("5").toUtf8();
+        else if (m_devType == "8748")
+            requestData = QString("6").toUtf8();
 
         m_serialPort->write(requestData);
 
@@ -546,7 +562,7 @@ guiMainWindow::write()
         setLedColour(Qt::red);
         qApp->processEvents();
 
-        if (m_devType == "8755") {
+        if (m_devType == "8755" || m_devType == "8748") {
 
             // Check hex file size is 2kb
             if (m_HexFile->size() != 2048) {
@@ -601,10 +617,10 @@ guiMainWindow::write()
                 const QString response = QString::fromUtf8(responseData);
                 if (response == "OK") {
                     statusBar()->showMessage("Write OK");
-                    appendText(QString("Wrote %1 bytes").arg(requestData.size()));
+                    appendText(QString("Wrote %1 bytes").arg(byte_count));
                 }
                 else {
-                    serialError(QString("Failed to write %1 bytes)").arg(requestData.size()));
+                    serialError(QString("Failed to write %1 bytes)").arg(byte_count));
                 }
             } else {
                 serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
