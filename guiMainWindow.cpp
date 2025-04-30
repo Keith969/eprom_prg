@@ -565,7 +565,7 @@ guiMainWindow::write()
         if (m_devType == "8755" || m_devType == "8748") {
 
             // Check hex file size is 2kb
-            if (m_HexFile->size() != 2048) {
+            if ((m_devType == "8755") && (m_HexFile->size() != 2048) || (m_devType == "8748") && (m_HexFile->size() != 1024)) {
                 clearText();
                 appendText("HEX file size is not 2048 bytes!\n");
                 return;
