@@ -516,9 +516,16 @@ guiMainWindow::check()
                     // Convert to hex char
                     bool ok = false;
                     uint8_t dev_chr = ss.toInt(&ok, 16);
-                    // Compare with 0xff
-                    if (255 != dev_chr) {
-                        fails++;
+                    // Compare with 0xff for all but 8748 which erases to 0x00
+                    if (m_devType == "8748") {
+                        if (0x00 != dev_chr) {
+                            fails++;
+                        }
+                    }
+                    else {
+                        if (0xff != dev_chr) {
+                            fails++;
+                        }
                     }
                     j += 3;
                 }
