@@ -467,6 +467,14 @@ guiMainWindow::read()
     setLedColour(Qt::green);
 
 #else
+    if (m_serialPort) {
+        m_serialPort->close();
+        delete m_serialPort;
+        m_serialPort=nullptr;
+    }
+    setLedColour(Qt::red);
+    qApp->processEvents();
+
     QString portName = ui.serialPort->currentText();
     int32_t timeout = ui.timeOut->value() * 1000;
     int32_t baudRate = ui.baudRate->currentText().toInt();
@@ -474,12 +482,12 @@ guiMainWindow::read()
     QString devType = ui.deviceType->currentText();
 
     readThread read_thread;
-    QObject::connect(&read_thread, SIGNAL(error(const QString &)), this, SLOT(&serialError(const QString &)));
-    QObject::connect(&read_thread, SIGNAL(timeout(const QString&)), this, SLOT(&serialTimeout(const QString&)));
-    QObject::connect(&read_thread, SIGNAL(response(const QString & s)), this, SLOT(&readResponse(const QString&)));
+    QObject::connect(&read_thread, SIGNAL(error(const QString &)), this, SLOT(serialError(const QString &)));
+    QObject::connect(&read_thread, SIGNAL(timeout(const QString &)), this, SLOT(serialTimeout(const QString&)));
+    QObject::connect(&read_thread, SIGNAL(response(const QString &)), this, SLOT(readResponse(const QString&)));
     read_thread.transaction(portName,
                             CMD_READ,
-                            m_devType,
+                            devType,
                             timeout,
                             baudRate,
                             flowControl);
@@ -495,11 +503,8 @@ guiMainWindow::read()
 void
 guiMainWindow::readResponse(const QString &s)
 {
-    if (s.size() > 2) {
-        statusBar()->showMessage("Read OK");
-        clearText();
-        appendText(s);
-    }
+    clearText();
+    appendText(s);
     statusBar()->showMessage("Ready");
     setLedColour(Qt::green);
 }

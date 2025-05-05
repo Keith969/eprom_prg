@@ -42,7 +42,7 @@ readThread::transaction(const QString &portName,
                                int baudRate,
                                int flowControl)
 {
-    const QMutexLocker locker(&m_mutex);
+    //const QMutexLocker locker(&m_mutex);
     m_portName = portName;
     m_waitTimeout = waitTimeout;
     m_baudrate = baudRate;
@@ -51,11 +51,6 @@ readThread::transaction(const QString &portName,
     m_bytesSent = 0;
     m_bytesReceived = 0;
     m_devType = devType;
-
-    if (!isRunning())
-        start();
-    else
-        m_cond.wakeOne();
 }
 
 // *****************************************************************************
