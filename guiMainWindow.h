@@ -70,9 +70,6 @@ private:
     // The hex file structure
     hexFile              * m_HexFile;
 
-    // Sender thread
-    QSerialPort          * m_serialPort;
-
     // Status bar
     QStatusBar             m_statusBar;
     QLabel                 m_statusMsg;

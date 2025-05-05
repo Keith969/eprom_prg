@@ -38,13 +38,13 @@ HEADERS += \
     guiMainWindow.h \
     initThread.h \
     qLedWidget.h \
-    readThread.h
+    readThread.h \
     E8755Thread.h \
     E2708Thread.h \
     E2716Thread.h \
     TMS2716Thread.h \
     E2532Thread.h \
-    E2732Thread.h
+	E2732Thread.h
 
 SOURCES += \
     hexFile.cpp \

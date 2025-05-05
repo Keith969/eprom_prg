@@ -89,8 +89,6 @@ guiMainWindow::guiMainWindow(QWidget *parent)
     ui.writeButton->setEnabled(false);
     ui.verifyButton->setEnabled(false);
     ui.resetButton->setEnabled(false);
-
-    m_serialPort = nullptr;
 }
 
 // *****************************************************************************
@@ -100,10 +98,6 @@ guiMainWindow::guiMainWindow(QWidget *parent)
 guiMainWindow::~guiMainWindow()
 {
     delete m_HexFile;
-    if (m_serialPort) {
-        m_serialPort->close();
-        delete m_serialPort;
-    }
 }
 
 // *****************************************************************************
@@ -514,20 +508,20 @@ guiMainWindow::write()
         QString devType = ui.deviceType->currentText();
 
         statusBar()->showMessage(QString("Status: Connected to port %1.")
-                                     .arg(m_serialPort->portName()));
+                                     .arg(portName));
 
         setLedColour(Qt::red);
         qApp->processEvents();
 
-        if (m_devType == "8755" || m_devType == "8748") {
+        if (devType == "8755" || devType == "8748") {
 
             // Check hex file size is 2kb
-            if ((m_devType == "8755") && (m_HexFile->size() != 2048)) {
+            if ((devType == "8755") && (m_HexFile->size() != 2048)) {
                 clearText();
                 appendText("HEX file size is not 2048 bytes!\n");
                 return;
             }
-            if ((m_devType == "8748") && (m_HexFile->size() != 1024)) {
+            if ((devType == "8748") && (m_HexFile->size() != 1024)) {
                 clearText();
                 appendText("HEX file size is not 1024 bytes!\n");
                 return;
@@ -547,7 +541,7 @@ guiMainWindow::write()
             write_thread.start();
         }
 
-        else if (m_devType == "2708") {
+        else if (devType == "2708") {
 
             // Check hex file size is 1kb
             if (m_HexFile->size() != 1024) {
@@ -570,7 +564,7 @@ guiMainWindow::write()
             write_thread.start();
         }
 
-        else if (m_devType == "TMS2716") {
+        else if (devType == "TMS2716") {
 
             // Check hex file size is 2kb
             if (m_HexFile->size() != 2048) {
@@ -593,7 +587,7 @@ guiMainWindow::write()
             write_thread.start();
         }
 
-        else if (m_devType == "2716") {
+        else if (devType == "2716") {
 
             // Check hex file size is 2kb
             if (m_HexFile->size() != 2048) {
@@ -616,7 +610,7 @@ guiMainWindow::write()
             write_thread.start();
         }
 
-        else if (m_devType == "2532") {
+        else if (devType == "2532") {
 
             // Check hex file size is 4kb
             if (m_HexFile->size() != 4096) {
@@ -639,7 +633,7 @@ guiMainWindow::write()
             write_thread.start();
         }
 
-        else if (m_devType == "2732") {
+        else if (devType == "2732") {
 
             // Check hex file size is 4kb
             if (m_HexFile->size() != 4096) {
@@ -692,7 +686,7 @@ guiMainWindow::verify()
     readThread read_thread;
     QObject::connect(&read_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
     QObject::connect(&read_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
-    QObject::connect(&read_thread, SIGNAL(response(const QString&)), this, SLOT(readResponse(const QString&)));
+    QObject::connect(&read_thread, SIGNAL(response(const QString&)), this, SLOT(verifyResponse(const QString&)));
     read_thread.transaction(portName,
         CMD_READ,
         devType,
