@@ -39,6 +39,12 @@ HEADERS += \
     initThread.h \
     qLedWidget.h \
     readThread.h
+    E8755Thread.h \
+    E2708Thread.h \
+    E2716Thread.h \
+    TMS2716Thread.h \
+    E2532Thread.h \
+    E2732Thread.h
 
 SOURCES += \
     hexFile.cpp \
@@ -46,7 +52,13 @@ SOURCES += \
     initThread.cpp \
     main.cpp \
     qLedWidget.cpp \
-    readThread.cpp
+    readThread.cpp \
+    E8755Thread.cpp \
+    E2708Thread.cpp \
+    E2716Thread.cpp \
+    TMS2716Thread.cpp \
+    E2532Thread.cpp \
+    E2732Thread.cpp
 
 FORMS += \
     guiMainWindow.ui
