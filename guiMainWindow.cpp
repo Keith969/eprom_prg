@@ -423,6 +423,7 @@ guiMainWindow::read()
         return;
     }
 
+#if 0
     int32_t timeout = ui.timeOut->value() * 1000;
     statusBar()->showMessage(QString("Status: Connected to port %1.")
                                  .arg(m_serialPort->portName()));
@@ -463,6 +464,43 @@ guiMainWindow::read()
         serialTimeout(QString("Send Read cmd timeout %1").arg(QTime::currentTime().toString()));
     }
 
+    setLedColour(Qt::green);
+
+#else
+    QString portName = ui.serialPort->currentText();
+    int32_t timeout = ui.timeOut->value() * 1000;
+    int32_t baudRate = ui.baudRate->currentText().toInt();
+    int32_t flowControl = getFlowControl();
+    QString devType = ui.deviceType->currentText();
+
+    readThread read_thread;
+    QObject::connect(&read_thread, SIGNAL(error(const QString &)), this, SLOT(&serialError(const QString &)));
+    QObject::connect(&read_thread, SIGNAL(timeout(const QString&)), this, SLOT(&serialTimeout(const QString&)));
+    QObject::connect(&read_thread, SIGNAL(response(const QString & s)), this, SLOT(&readResponse(const QString&)));
+    read_thread.transaction(portName,
+                            CMD_READ,
+                            m_devType,
+                            timeout,
+                            baudRate,
+                            flowControl);
+    read_thread.start();
+#endif
+
+}
+
+// *****************************************************************************
+// Function     [ readResponse ]
+// Description  [ ]
+// *****************************************************************************
+void
+guiMainWindow::readResponse(const QString &s)
+{
+    if (s.size() > 2) {
+        statusBar()->showMessage("Read OK");
+        clearText();
+        appendText(s);
+    }
+    statusBar()->showMessage("Ready");
     setLedColour(Qt::green);
 }
 

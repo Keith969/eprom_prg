@@ -12,6 +12,7 @@
 #include "ui_guiMainWindow.h"
 #include "hexFile.h"
 #include "qLedWidget.h"
+#include "readThread.h"
 
 #define CMD_DONE "$0"
 #define CMD_READ "$1"
@@ -48,6 +49,8 @@ public slots:
 
     void                   serialError(const QString &);
     void                   serialTimeout(const QString &);
+
+    void                   readResponse(const QString&);
 
     void                   appendText(const QString& s) { ui.textEdit->append(s); }
     void                   clearText() { ui.textEdit->clear(); }

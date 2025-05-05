@@ -37,14 +37,14 @@ HEADERS += \
     hexFile.h \
     guiMainWindow.h \
     qLedWidget.h \
-    senderthread.h
+    readThread.h
 
 SOURCES += \
     hexFile.cpp \
     guiMainWindow.cpp \
     main.cpp \
     qLedWidget.cpp \
-    senderthread.cpp
+    readThread.cpp
 
 FORMS += \
     guiMainWindow.ui

@@ -1,11 +1,8 @@
-// Copyright (C) 2012 Denis Shienkov <denis.shienkov@gmail.com>
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
-
-#ifndef SENDERTHREAD_H
-#define SENDERTHREAD_H
+#ifndef READTHREAD_H
+#define READTHREAD_H
 
 // *****************************************************************************
-// File         [ SenderThread.h ]
+// File         [ ReadThread.h ]
 // Description  [ Implementation of the SenderThread class ]
 // Author       [ Keith Sabine ]
 // *****************************************************************************
@@ -15,24 +12,23 @@
 #include <QWaitCondition>
 
 // *****************************************************************************
-// Class        [ SenderThread ]
+// Class        [ readThread ]
 // Description  [ ]
 // *****************************************************************************
-class SenderThread : public QThread
+class readThread : public QThread
 {
     Q_OBJECT
 
 public:
-    explicit SenderThread(QObject *parent = nullptr);
-    ~SenderThread();
+    explicit readThread(QObject *parent = nullptr);
+    ~readThread();
 
     void                      transaction(const QString &portName,
                                             const QString &request,
                                             const QString &devType,
                                             int waitTimeout=10000,
                                             int baudRate=115200,
-                                            int flowControl=0,
-                                            bool program=false);
+                                            int flowControl=0);
     size_t                    bytesSent() {return m_bytesSent;}
     size_t                    bytesReceived() {m_bytesReceived;}
 
@@ -50,12 +46,10 @@ private:
     int                       m_waitTimeout = 0;
     QMutex                    m_mutex;
     QWaitCondition            m_cond;
-    bool                      m_quit = false;
     int32_t                   m_baudrate = 115200;
     int32_t                   m_flowControl = 0;
     size_t                    m_bytesSent;
     size_t                    m_bytesReceived;
-    bool                      m_program;
 };
 
-#endif /* SENDERTHREAD_H */
+#endif /* READTHREAD_H */
