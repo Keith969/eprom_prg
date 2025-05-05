@@ -5,6 +5,12 @@
 // *****************************************************************************
 
 #include "guiMainWindow.h"
+#include "E8755Thread.h"
+#include "E2708Thread.h"
+#include "E2716Thread.h"
+#include "E2532Thread.h"
+#include "E2732Thread.h"
+#include "TMS2716Thread.h"
 
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
@@ -369,11 +375,6 @@ guiMainWindow::read()
         return;
     }
 
-    if (m_serialPort) {
-        m_serialPort->close();
-        delete m_serialPort;
-        m_serialPort=nullptr;
-    }
     setLedColour(Qt::red);
     qApp->processEvents();
 
@@ -423,11 +424,6 @@ guiMainWindow::check()
         return;
     }
 
-    if (m_serialPort) {
-        m_serialPort->close();
-        delete m_serialPort;
-        m_serialPort=nullptr;
-    }
     setLedColour(Qt::red);
     qApp->processEvents();
 
@@ -511,7 +507,12 @@ guiMainWindow::write()
         return;
     }
     if (m_HexFile->size() > 0) {
+        QString portName = ui.serialPort->currentText();
         int32_t timeout = ui.timeOut->value() * 1000;
+        int32_t baudRate = ui.baudRate->currentText().toInt();
+        int32_t flowControl = getFlowControl();
+        QString devType = ui.deviceType->currentText();
+
         statusBar()->showMessage(QString("Status: Connected to port %1.")
                                      .arg(m_serialPort->portName()));
 
@@ -521,67 +522,29 @@ guiMainWindow::write()
         if (m_devType == "8755" || m_devType == "8748") {
 
             // Check hex file size is 2kb
-            if ((m_devType == "8755") && (m_HexFile->size() != 2048) || (m_devType == "8748") && (m_HexFile->size() != 1024)) {
+            if ((m_devType == "8755") && (m_HexFile->size() != 2048)) {
                 clearText();
                 appendText("HEX file size is not 2048 bytes!\n");
                 return;
             }
-
-            statusBar()->showMessage("Writing...");
-            clearText();
-            appendText("Writing data to DUT...");
-            qApp->processEvents();
-            int32_t byte_count=0;
-
-            // Send the cmd, followed by the data.
-            QString request(CMD_WRTE);
-            // Send the cmd + data
-            const QByteArray requestData = request.toUtf8();
-            m_serialPort->write(requestData);
-
-            // Send the data as bytes, using pairs of chars.
-            std::vector<hexDataChunk> hData = m_HexFile->hexData();
-
-            for (auto iter = hData.begin(); iter != hData.end(); ++iter) {
-                hexDataChunk chunk = *iter;
-                std::vector<uint8_t> data = chunk.data();
-                uint8_t count = chunk.byteCount();
-                for (int8_t i=0; i < count; ++i) {
-                    const short d = data.at(i);
-                    QByteArray c=QString("%1").arg(d, 2, 16, QChar('0')).toUtf8();
-                    // If RTS is false, sleep
-                    //while (m_serialPort->isRequestToSend() == false) {
-                    //    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                    //}
-                    // Delay sending to the program pulse width, in this case 50mS
-                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                    m_serialPort->write(c);
-                    m_serialPort->flush();
-                    byte_count++;
-                }
+            if ((m_devType == "8748") && (m_HexFile->size() != 1024)) {
+                clearText();
+                appendText("HEX file size is not 1024 bytes!\n");
+                return;
             }
 
-
-            // Read response from the PIC
-            if (m_serialPort->waitForReadyRead(timeout)) {
-
-                QByteArray responseData = m_serialPort->readAll();
-
-                while (m_serialPort->waitForReadyRead(10)) {
-                    responseData += m_serialPort->readAll();
-                }
-                const QString response = QString::fromUtf8(responseData);
-                if (response == "OK") {
-                    statusBar()->showMessage("Write OK");
-                    appendText(QString("Wrote %1 bytes").arg(byte_count));
-                }
-                else {
-                    serialError(QString("Failed to write %1 bytes)").arg(byte_count));
-                }
-            } else {
-                serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
-            }
-            appendText(QString("Write complete!"));
+            E8755Thread write_thread;
+            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            write_thread.transaction(portName,
+                CMD_READ,
+                devType,
+                timeout,
+                baudRate,
+                flowControl,
+                m_HexFile);
+            write_thread.start();
         }
 
         else if (m_devType == "2708") {
@@ -593,63 +556,18 @@ guiMainWindow::write()
                 return;
             }
 
-            // Repeat write 100 times...
-            for (int32_t j=0; j < 100; ++j) {
-
-                statusBar()->showMessage(QString("Writing pass %1...").arg(j));
-                appendText(QString("Writing pass %1 to DUT").arg(j));
-                qApp->processEvents();
-                int32_t byte_count=0;
-
-                // Send the cmd, followed by the data.
-                QString request(CMD_WRTE);
-                // Send the cmd + data
-                const QByteArray requestData = request.toUtf8();
-                m_serialPort->write(requestData);
-
-                // Send the data as bytes, using pairs of chars.
-                std::vector<hexDataChunk> hData = m_HexFile->hexData();
-
-                for (auto iter = hData.begin(); iter != hData.end(); ++iter) {
-                    hexDataChunk chunk = *iter;
-                    std::vector<uint8_t> data = chunk.data();
-                    uint8_t count = chunk.byteCount();
-                    for (int8_t i=0; i < count; ++i) {
-                        const short d = data.at(i);
-                        QByteArray c = QString("%1").arg(d, 2, 16, QChar('0')).toUtf8();
-                        // If RTS is false, sleep
-                        //while (m_serialPort->isRequestToSend() == false) {
-                        //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                        //}
-                        // Delay sending to the program pulse width, in this case 1mS
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                        m_serialPort->write(c);
-                        m_serialPort->flush();
-                        byte_count++;
-                    }
-                }
-
-                // Read response from the PIC
-                if (m_serialPort->waitForReadyRead(timeout)) {
-
-                    QByteArray responseData = m_serialPort->readAll();
-
-                    while (m_serialPort->waitForReadyRead(10)) {
-                        responseData += m_serialPort->readAll();
-                    }
-                    const QString response = QString::fromUtf8(responseData);
-                    if (response == "OK") {
-                        statusBar()->showMessage("Write OK");
-                        appendText(QString("Wrote %1 bytes").arg(byte_count));
-                    }
-                    else {
-                        serialError(QString("Failed to write %1 bytes)").arg(byte_count));
-                    }
-                } else {
-                    serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
-                }
-            }
-            appendText(QString("Write complete!"));
+            E2708Thread write_thread;
+            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            write_thread.transaction(portName,
+                CMD_READ,
+                devType,
+                timeout,
+                baudRate,
+                flowControl,
+                m_HexFile);
+            write_thread.start();
         }
 
         else if (m_devType == "TMS2716") {
@@ -661,63 +579,18 @@ guiMainWindow::write()
                 return;
             }
 
-            // Repeat write 100 times...
-            for (int32_t j=0; j < 100; ++j) {
-
-                statusBar()->showMessage(QString("Writing pass %1...").arg(j));
-                appendText(QString("Writing pass %1 to DUT").arg(j));
-                qApp->processEvents();
-                int32_t byte_count=0;
-
-                // Send the cmd, followed by the data.
-                QString request(CMD_WRTE);
-                // Send the cmd + data
-                const QByteArray requestData = request.toUtf8();
-                m_serialPort->write(requestData);
-
-                // Send the data as bytes, using pairs of chars.
-                std::vector<hexDataChunk> hData = m_HexFile->hexData();
-
-                for (auto iter = hData.begin(); iter != hData.end(); ++iter) {
-                    hexDataChunk chunk = *iter;
-                    std::vector<uint8_t> data = chunk.data();
-                    uint8_t count = chunk.byteCount();
-                    for (int8_t i=0; i < count; ++i) {
-                        const short d = data.at(i);
-                        QByteArray c = QString("%1").arg(d, 2, 16, QChar('0')).toUtf8();
-                        // If RTS is false, sleep
-                        //while (m_serialPort->isRequestToSend() == false) {
-                        //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                        //}
-                        // Delay sending to the program pulse width, in this case 1mS
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                        m_serialPort->write(c);
-                        m_serialPort->flush();
-                        byte_count++;
-                    }
-                }
-
-                // Read response from the PIC
-                if (m_serialPort->waitForReadyRead(timeout)) {
-
-                    QByteArray responseData = m_serialPort->readAll();
-
-                    while (m_serialPort->waitForReadyRead(10)) {
-                        responseData += m_serialPort->readAll();
-                    }
-                    const QString response = QString::fromUtf8(responseData);
-                    if (response == "OK") {
-                        statusBar()->showMessage("Write OK");
-                        appendText(QString("Wrote %1 bytes").arg(byte_count));
-                    }
-                    else {
-                        serialError(QString("Failed to write %1 bytes)").arg(byte_count));
-                    }
-                } else {
-                    serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
-                }
-            }
-            appendText(QString("Write complete!"));
+            T2716Thread write_thread;
+            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            write_thread.transaction(portName,
+                CMD_READ,
+                devType,
+                timeout,
+                baudRate,
+                flowControl,
+                m_HexFile);
+            write_thread.start();
         }
 
         else if (m_devType == "2716") {
@@ -729,60 +602,18 @@ guiMainWindow::write()
                 return;
             }
 
-            statusBar()->showMessage(QString("Writing..."));
-            appendText(QString("Writing to DUT"));
-            qApp->processEvents();
-            int32_t byte_count=0;
-
-            // Send the cmd, followed by the data.
-            QString request(CMD_WRTE);
-            // Send the cmd + data
-            const QByteArray requestData = request.toUtf8();
-            m_serialPort->write(requestData);
-
-            // Send the data as bytes, using pairs of chars.
-            std::vector<hexDataChunk> hData = m_HexFile->hexData();
-
-            for (auto iter = hData.begin(); iter != hData.end(); ++iter) {
-                hexDataChunk chunk = *iter;
-                std::vector<uint8_t> data = chunk.data();
-                uint8_t count = chunk.byteCount();
-                for (int8_t i=0; i < count; ++i) {
-                    const short d = data.at(i);
-                    QByteArray c = QString("%1").arg(d, 2, 16, QChar('0')).toUtf8();
-                    // If RTS is false, sleep
-                    //while (m_serialPort->isRequestToSend() == false) {
-                    //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                    //}
-                    // Delay sending to the program pulse width, in this case 50mS
-                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                    m_serialPort->write(c);
-                    m_serialPort->flush();
-                    byte_count++;
-                }
-            }
-
-            // Read response from the PIC
-            if (m_serialPort->waitForReadyRead(timeout)) {
-
-                QByteArray responseData = m_serialPort->readAll();
-
-                while (m_serialPort->waitForReadyRead(10)) {
-                    responseData += m_serialPort->readAll();
-                }
-                const QString response = QString::fromUtf8(responseData);
-                if (response == "OK") {
-                    statusBar()->showMessage("Write OK");
-                    appendText(QString("Wrote %1 bytes").arg(byte_count));
-                }
-                else {
-                    serialError(QString("Failed to write %1 bytes)").arg(byte_count));
-                }
-            } else {
-                serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
-            }
-
-            appendText(QString("Write complete!"));
+            E2716Thread write_thread;
+            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            write_thread.transaction(portName,
+                CMD_READ,
+                devType,
+                timeout,
+                baudRate,
+                flowControl,
+                m_HexFile);
+            write_thread.start();
         }
 
         else if (m_devType == "2532") {
@@ -794,60 +625,18 @@ guiMainWindow::write()
                 return;
             }
 
-            statusBar()->showMessage(QString("Writing..."));
-            appendText(QString("Writing to DUT"));
-            qApp->processEvents();
-            int32_t byte_count=0;
-
-            // Send the cmd, followed by the data.
-            QString request(CMD_WRTE);
-            // Send the cmd + data
-            const QByteArray requestData = request.toUtf8();
-            m_serialPort->write(requestData);
-
-            // Send the data as bytes, using pairs of chars.
-            std::vector<hexDataChunk> hData = m_HexFile->hexData();
-
-            for (auto iter = hData.begin(); iter != hData.end(); ++iter) {
-                hexDataChunk chunk = *iter;
-                std::vector<uint8_t> data = chunk.data();
-                uint8_t count = chunk.byteCount();
-                for (int8_t i=0; i < count; ++i) {
-                    const short d = data.at(i);
-                    QByteArray c = QString("%1").arg(d, 2, 16, QChar('0')).toUtf8();
-                    // If RTS is false, sleep
-                    //while (m_serialPort->isRequestToSend() == false) {
-                    //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                    //}
-                    // Delay sending to the program pulse width, in this case 50mS
-                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
-                    m_serialPort->write(c);
-                    m_serialPort->flush();
-                    byte_count++;
-                }
-            }
-
-            // Read response from the PIC
-            if (m_serialPort->waitForReadyRead(timeout)) {
-
-                QByteArray responseData = m_serialPort->readAll();
-
-                while (m_serialPort->waitForReadyRead(10)) {
-                    responseData += m_serialPort->readAll();
-                }
-                const QString response = QString::fromUtf8(responseData);
-                if (response == "OK") {
-                    statusBar()->showMessage("Write OK");
-                    appendText(QString("Wrote %1 bytes").arg(byte_count));
-                }
-                else {
-                    serialError(QString("Failed to write %1 bytes)").arg(byte_count));
-                }
-            } else {
-                serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
-            }
-
-            appendText(QString("Write complete!"));
+            E2532Thread write_thread;
+            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            write_thread.transaction(portName,
+                CMD_READ,
+                devType,
+                timeout,
+                baudRate,
+                flowControl,
+                m_HexFile);
+            write_thread.start();
         }
 
         else if (m_devType == "2732") {
@@ -859,60 +648,18 @@ guiMainWindow::write()
                 return;
             }
 
-            statusBar()->showMessage(QString("Writing..."));
-            appendText(QString("Writing to DUT"));
-            qApp->processEvents();
-            int32_t byte_count=0;
-
-            // Send the cmd, followed by the data.
-            QString request(CMD_WRTE);
-            // Send the cmd + data
-            const QByteArray requestData = request.toUtf8();
-            m_serialPort->write(requestData);
-
-            // Send the data as bytes, using pairs of chars.
-            std::vector<hexDataChunk> hData = m_HexFile->hexData();
-
-            for (auto iter = hData.begin(); iter != hData.end(); ++iter) {
-                hexDataChunk chunk = *iter;
-                std::vector<uint8_t> data = chunk.data();
-                uint8_t count = chunk.byteCount();
-                for (int8_t i=0; i < count; ++i) {
-                    const short d = data.at(i);
-                    QByteArray c = QString("%1").arg(d, 2, 16, QChar('0')).toUtf8();
-                    // If RTS is false, sleep
-                    //while (m_serialPort->isRequestToSend() == false) {
-                    //    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                    //}
-                    // Delay sending to the program pulse width, in this case 10mS
-                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                    m_serialPort->write(c);
-                    m_serialPort->flush();
-                    byte_count++;
-                }
-            }
-
-            // Read response from the PIC
-            if (m_serialPort->waitForReadyRead(timeout)) {
-
-                QByteArray responseData = m_serialPort->readAll();
-
-                while (m_serialPort->waitForReadyRead(10)) {
-                    responseData += m_serialPort->readAll();
-                }
-                const QString response = QString::fromUtf8(responseData);
-                if (response == "OK") {
-                    statusBar()->showMessage("Write OK");
-                    appendText(QString("Wrote %1 bytes").arg(byte_count));
-                }
-                else {
-                    serialError(QString("Failed to write %1 bytes)").arg(byte_count));
-                }
-            } else {
-                serialTimeout(QString("Write cmd response timeout %1").arg(QTime::currentTime().toString()));
-            }
-
-            appendText(QString("Write complete!"));
+            E2732Thread write_thread;
+            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            write_thread.transaction(portName,
+                CMD_READ,
+                devType,
+                timeout,
+                baudRate,
+                flowControl,
+                m_HexFile);
+            write_thread.start();
         }
     }
     else {
@@ -928,92 +675,110 @@ guiMainWindow::write()
 void
 guiMainWindow::verify()
 {
-    if (! m_initOK) {
+    if (!m_initOK) {
         QMessageBox::critical(this, "Baud rate", "Init baud rate first!", QMessageBox::Ok);
         return;
     }
 
-    int32_t timeout = ui.timeOut->value() * 1000;
-    statusBar()->showMessage(QString("Status: Connected to port %1.")
-                                 .arg(m_serialPort->portName()));
-
     setLedColour(Qt::red);
     qApp->processEvents();
 
-    // Send the cmd.
-    m_serialPort->write(CMD_READ);
+    QString portName = ui.serialPort->currentText();
+    int32_t timeout = ui.timeOut->value() * 1000;
+    int32_t baudRate = ui.baudRate->currentText().toInt();
+    int32_t flowControl = getFlowControl();
+    QString devType = ui.deviceType->currentText();
 
-    // Did we get a response?
-    if (m_serialPort->waitForBytesWritten(timeout)) {
+    readThread read_thread;
+    QObject::connect(&read_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+    QObject::connect(&read_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+    QObject::connect(&read_thread, SIGNAL(response(const QString&)), this, SLOT(readResponse(const QString&)));
+    read_thread.transaction(portName,
+        CMD_READ,
+        devType,
+        timeout,
+        baudRate,
+        flowControl);
+    read_thread.start();
+}
 
-        // read response from the PIC
-        if (m_serialPort->waitForReadyRead(timeout)) {
-
-            QByteArray responseData = m_serialPort->readAll();
-
-            while (m_serialPort->waitForReadyRead(1000)) {
-                responseData += m_serialPort->readAll();
-            }
-            const QString response = QString::fromUtf8(responseData);
-            if (response.size() > 2) {
-
-                clearText();
-                // Compare each char of s to the hexfile
-                std::vector<hexDataChunk> hexdata = m_HexFile->hexData();
-                int32_t j=0;
-                int32_t bad=0;
-                bool ok = true;
-                for (auto iter = hexdata.begin(); iter != hexdata.end(); ++iter, ++j) {
-                    hexDataChunk chunk = *iter;
-                    // Write the address of the chunk
-                    QString ss; ss.setNum(chunk.address(), 16);
-                    ui.textEdit->insertPlainText(QString("%1: ").arg(ss,4,QChar('0')));
-                    j += 6; // skip addr e.g. '0000: '
-                    std::vector<uint8_t> data = chunk.data();
-                    for (int32_t i=0; i < data.size(); ++i) {
-                        // chunk's hex characters given by data.at(i)
-                        uint8_t hex_chr = data.at(i);
-                        // dev's data is 2 chars
-                        QString ss = response.mid(j, 2);
-                        // Convert to hex char
-                        uint8_t dev_chr = ss.toInt(&ok, 16);
-                        // Compare the data. If equal, write the data,
-                        // if not equal, write the data in red.
-                        if (hex_chr == dev_chr) {
-                            ui.textEdit->insertPlainText(QString("%1 ").arg(ss,2,QChar('0')));
-                        }
-                        else {
-                            ui.textEdit->setTextColor(Qt::red);
-                            ui.textEdit->insertPlainText(QString("%1 ").arg(ss,2,QChar('0')));
-                            ui.textEdit->setTextColor(Qt::black);
-                            bad++;
-                        }
-                        // increment j pointer
-                        if (i == 15) {
-                            j += 2;
-                        } else {
-                            j += 3;
-                        }
-                    }
-                    ui.textEdit->insertPlainText("\n");
-                }
-                if (bad != 0) {
-                    statusBar()->showMessage(QString("DUT has %1 differences with hex file!").arg(bad));
+// *****************************************************************************
+// Function     [ verifyResponse ]
+// Description  [ ]
+// *****************************************************************************
+void
+guiMainWindow::verifyResponse(const QString& s)
+{
+    if (s.size() > 2) {
+        clearText();
+        // Compare each char of s to the hexfile
+        std::vector<hexDataChunk> hexdata = m_HexFile->hexData();
+        int32_t j = 0;
+        int32_t bad = 0;
+        bool ok = true;
+        for (auto iter = hexdata.begin(); iter != hexdata.end(); ++iter, ++j) {
+            hexDataChunk chunk = *iter;
+            // Write the address of the chunk
+            QString ss; ss.setNum(chunk.address(), 16);
+            ui.textEdit->insertPlainText(QString("%1: ").arg(ss, 4, QChar('0')));
+            j += 6; // skip addr e.g. '0000: '
+            std::vector<uint8_t> data = chunk.data();
+            for (int32_t i = 0; i < data.size(); ++i) {
+                // chunk's hex characters given by data.at(i)
+                uint8_t hex_chr = data.at(i);
+                // dev's data is 2 chars
+                QString ss = s.mid(j, 2);
+                // Convert to hex char
+                uint8_t dev_chr = ss.toInt(&ok, 16);
+                // Compare the data. If equal, write the data,
+                // if not equal, write the data in red.
+                if (hex_chr == dev_chr) {
+                    ui.textEdit->insertPlainText(QString("%1 ").arg(ss, 2, QChar('0')));
                 }
                 else {
-                    statusBar()->showMessage("DUT verified correct.");
+                    ui.textEdit->setTextColor(Qt::red);
+                    ui.textEdit->insertPlainText(QString("%1 ").arg(ss, 2, QChar('0')));
+                    ui.textEdit->setTextColor(Qt::black);
+                    bad++;
+                }
+                // increment j pointer
+                if (i == 15) {
+                    j += 2;
+                }
+                else {
+                    j += 3;
                 }
             }
-            else {
-                serialError("Failed to read from serial link");
-            }
-        } else {
-            serialTimeout(QString("Verify response timeout %1").arg(QTime::currentTime().toString()));
+            ui.textEdit->insertPlainText("\n");
         }
-    } else {
-        serialTimeout(QString("Verify cmd write timeout %1").arg(QTime::currentTime().toString()));
+        if (bad != 0) {
+            statusBar()->showMessage(QString("DUT has %1 differences with hex file!").arg(bad));
+        }
+        else {
+            statusBar()->showMessage("DUT verified correct.");
+        }
     }
+    setLedColour(Qt::green);
+}
 
+// *****************************************************************************
+// Function     [ writeResponse ]
+// Description  [ ]
+// *****************************************************************************
+void
+guiMainWindow::writeResponse(const QString &s)
+{
+    if (s.startsWith("OK")) {
+        statusBar()->showMessage("Write OK");
+        QStringList bc = s.split(' ');
+        int32_t byte_count = bc.at(1).toInt();
+        appendText(QString("Wrote %1 bytes").arg(byte_count));
+    }
+    else {
+        QStringList bc = s.split(' ');
+        int32_t byte_count = bc.at(1).toInt();
+        serialError(QString("Failed to write %1 bytes)").arg(byte_count));
+    }
     setLedColour(Qt::green);
 }
 
@@ -1052,4 +817,3 @@ guiMainWindow::serialTimeout(const QString &s)
     statusBar()->showMessage("Ready");
     setLedColour(Qt::green);
 }
-

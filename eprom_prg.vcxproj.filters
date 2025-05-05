@@ -43,6 +43,24 @@
     <QtMoc Include="initThread.h">
       <Filter>Header Files</Filter>
     </QtMoc>
+    <QtMoc Include="E8755Thread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="E2708Thread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="E2532Thread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="E2716Thread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="TMS2716Thread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
+    <QtMoc Include="E2732Thread.h">
+      <Filter>Header Files</Filter>
+    </QtMoc>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="guiMainWindow.cpp">
@@ -61,6 +79,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="initThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E8755Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E2708Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TSM2716Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E2716Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E2532Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="E2732Thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

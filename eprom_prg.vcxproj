@@ -113,18 +113,32 @@
     <QtMoc Include="guiMainWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="E2708Thread.cpp" />
+    <ClCompile Include="E2716Thread.cpp" />
+    <ClCompile Include="E2532Thread.cpp" />
+    <ClCompile Include="E2732Thread.cpp" />
+    <ClCompile Include="E8755Thread.cpp" />
     <ClCompile Include="guiMainWindow.cpp" />
     <ClCompile Include="hexFile.cpp" />
     <ClCompile Include="initThread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="qLedWidget.cpp" />
     <ClCompile Include="readThread.cpp" />
+    <ClCompile Include="TSM2716Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <QtMoc Include="E2532Thread.h" />
+    <QtMoc Include="E2716Thread.h" />
+    <QtMoc Include="E2732Thread.h" />
+    <QtMoc Include="TMS2716Thread.h" />
+    <QtMoc Include="E8755Thread.h" />
     <ClInclude Include="hexFile.h" />
     <QtMoc Include="initThread.h" />
     <QtMoc Include="readThread.h" />
     <QtMoc Include="qLedWidget.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="E2708Thread.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

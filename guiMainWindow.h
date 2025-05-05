@@ -47,6 +47,9 @@ public slots:
     void                   initResponse(const QString &);
     void                   typeResponse(const QString &);
     void                   checkResponse(const QString &);
+    void                   writeResponse(const QString&);
+    void                   verifyResponse(const QString&);
+
     // Text window slots
     void                   appendText(const QString& s) {
         ui.textEdit->append(s);
