@@ -14,6 +14,12 @@
 #include "hexFile.h"
 #include "qLedWidget.h"
 #include "readThread.h"
+#include "E8755Thread.h"
+#include "E2708Thread.h"
+#include "E2716Thread.h"
+#include "TMS2716Thread.h"
+#include "E2532Thread.h"
+#include "E2732Thread.h"
 
 // *****************************************************************************
 // Class        [ guiMainWindow ]
@@ -79,6 +85,14 @@ private:
 
     // Device type
     QString                m_devType;
+
+    // Threads
+    E8755Thread             e8755_thread;
+    E2708Thread             e2708_thread;
+    T2716Thread             t2716_thread;
+    E2716Thread             e2716_thread;
+    E2532Thread             e2532_thread;
+    E2732Thread             e2732_thread;
 };
 
 #endif /* GUIMAINWINDOW_H */

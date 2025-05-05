@@ -273,9 +273,10 @@ guiMainWindow::init()
 
     if (m_initOK) {
         QMessageBox::warning(this, "Initialisation", "Serial link already set up!", QMessageBox::Ok);
+        return;
     }
     else {
-        statusBar()->showMessage(QString("Status: Connecting to port %1.").arg(portName));
+        statusBar()->showMessage(QString("Initialising PIC programmer"));
         setLedColour(Qt::red);
         qApp->processEvents();
     }
@@ -291,7 +292,6 @@ guiMainWindow::init()
                             timeout,
                             baudRate,
                             flowControl);
-    init_thread.start();
 }
 
 // *****************************************************************************
@@ -368,9 +368,11 @@ guiMainWindow::read()
         QMessageBox::critical(this, "Baud rate", "Init baud rate first!", QMessageBox::Ok);
         return;
     }
-
-    setLedColour(Qt::red);
-    qApp->processEvents();
+    else {
+        statusBar()->showMessage(QString("Reading from DUT"));
+        setLedColour(Qt::red);
+        qApp->processEvents();
+    }
 
     QString portName = ui.serialPort->currentText();
     int32_t timeout = ui.timeOut->value() * 1000;
@@ -388,7 +390,6 @@ guiMainWindow::read()
                             timeout,
                             baudRate,
                             flowControl);
-    read_thread.start();
 }
 
 // *****************************************************************************
@@ -417,9 +418,11 @@ guiMainWindow::check()
         QMessageBox::critical(this, "Baud rate", "Init baud rate first!", QMessageBox::Ok);
         return;
     }
-
-    setLedColour(Qt::red);
-    qApp->processEvents();
+    else {
+        statusBar()->showMessage(QString("Checking DUT"));
+        setLedColour(Qt::red);
+        qApp->processEvents();
+    }
 
     QString portName = ui.serialPort->currentText();
     int32_t timeout = ui.timeOut->value() * 1000;
@@ -437,7 +440,6 @@ guiMainWindow::check()
                             timeout,
                             baudRate,
                             flowControl);
-    read_thread.start();
 }
 
 // *****************************************************************************
@@ -507,9 +509,7 @@ guiMainWindow::write()
         int32_t flowControl = getFlowControl();
         QString devType = ui.deviceType->currentText();
 
-        statusBar()->showMessage(QString("Status: Connected to port %1.")
-                                     .arg(portName));
-
+        statusBar()->showMessage(QString("Writing to DUT"));
         setLedColour(Qt::red);
         qApp->processEvents();
 
@@ -527,11 +527,11 @@ guiMainWindow::write()
                 return;
             }
 
-            E8755Thread write_thread;
-            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
-            write_thread.transaction(portName,
+
+            QObject::connect(&e8755_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&e8755_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&e8755_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            e8755_thread.transaction(portName,
                 CMD_READ,
                 devType,
                 timeout,
@@ -549,11 +549,10 @@ guiMainWindow::write()
                 return;
             }
 
-            E2708Thread write_thread;
-            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
-            write_thread.transaction(portName,
+            QObject::connect(&e2708_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&e2708_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&e2708_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            e2708_thread.transaction(portName,
                 CMD_READ,
                 devType,
                 timeout,
@@ -571,11 +570,10 @@ guiMainWindow::write()
                 return;
             }
 
-            T2716Thread write_thread;
-            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
-            write_thread.transaction(portName,
+            QObject::connect(&t2716_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&t2716_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&t2716_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            t2716_thread.transaction(portName,
                 CMD_READ,
                 devType,
                 timeout,
@@ -593,11 +591,10 @@ guiMainWindow::write()
                 return;
             }
 
-            E2716Thread write_thread;
-            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
-            write_thread.transaction(portName,
+            QObject::connect(&e2716_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&e2716_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&e2716_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            e2716_thread.transaction(portName,
                 CMD_READ,
                 devType,
                 timeout,
@@ -615,11 +612,10 @@ guiMainWindow::write()
                 return;
             }
 
-            E2532Thread write_thread;
-            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
-            write_thread.transaction(portName,
+            QObject::connect(&e2532_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&e2532_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&e2532_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            e2532_thread.transaction(portName,
                 CMD_READ,
                 devType,
                 timeout,
@@ -637,11 +633,10 @@ guiMainWindow::write()
                 return;
             }
 
-            E2732Thread write_thread;
-            QObject::connect(&write_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
-            QObject::connect(&write_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
-            write_thread.transaction(portName,
+            QObject::connect(&e2732_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+            QObject::connect(&e2732_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+            QObject::connect(&e2732_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            e2732_thread.transaction(portName,
                 CMD_READ,
                 devType,
                 timeout,
@@ -667,9 +662,11 @@ guiMainWindow::verify()
         QMessageBox::critical(this, "Baud rate", "Init baud rate first!", QMessageBox::Ok);
         return;
     }
-
-    setLedColour(Qt::red);
-    qApp->processEvents();
+    else {
+        statusBar()->showMessage(QString("Verifying DUT"));
+        setLedColour(Qt::red);
+        qApp->processEvents();
+    }
 
     QString portName = ui.serialPort->currentText();
     int32_t timeout = ui.timeOut->value() * 1000;
@@ -687,7 +684,6 @@ guiMainWindow::verify()
         timeout,
         baudRate,
         flowControl);
-    read_thread.start();
 }
 
 // *****************************************************************************
