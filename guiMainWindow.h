@@ -48,7 +48,9 @@ public slots:
     void                   typeResponse(const QString &);
 
     // Text window slots
-    void                   appendText(const QString& s) { ui.textEdit->append(s); }
+    void                   appendText(const QString& s) {
+        ui.textEdit->append(s);
+    }
     void                   clearText() { ui.textEdit->clear(); }
 
     // LED control slots

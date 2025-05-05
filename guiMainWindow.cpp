@@ -240,7 +240,6 @@ guiMainWindow::reset()
     // Send the PIC a reset cmd
     serial.write(CMD_RSET);
     serial.flush();
-    serial.close();
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     m_initOK = false;
 
@@ -479,16 +478,22 @@ guiMainWindow::initResponse(const QString &s)
     ui.readButton->setEnabled(true);
     ui.writeButton->setEnabled(true);
     ui.verifyButton->setEnabled(true);
+    ui.resetButton->setEnabled(true);
     ui.initButton->setEnabled(false);
 
     if (ok == true) {
+        // Enable the buttons
+        ui.checkButton->setEnabled(true);
+        ui.readButton->setEnabled(true);
+        ui.writeButton->setEnabled(true);
+        ui.verifyButton->setEnabled(true);
+        ui.initButton->setEnabled(false);
         statusBar()->showMessage("Initialise OK");
     }
     else {
         serialError(QString("Failed to initialise serial link to %1 baud").arg(baudRate));
     }
 
-    appendText(s);
     statusBar()->showMessage("Ready");
     setLedColour(Qt::green);
 }
@@ -501,8 +506,9 @@ void
 guiMainWindow::typeResponse(const QString& s)
 {
     if (s == "OK") {
+        QString devType = ui.deviceType->currentText();
         statusBar()->showMessage("Write OK");
-        appendText(QString("Set device type to %1").arg(m_devType));
+        appendText(QString("Set device type to %1").arg(devType));
     }
     else {
         serialError(QString("Failed to write %1 bytes)").arg(s.size()));
