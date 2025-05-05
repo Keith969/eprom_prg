@@ -410,6 +410,18 @@ guiMainWindow::init()
     setLedColour(Qt::green);
 }
 
+// *****************************************************************************
+// Function     [ initResponse ]
+// Description  [ ]
+// *****************************************************************************
+void
+guiMainWindow::initResponse(const QString &s)
+{
+    clearText();
+    appendText(s);
+    statusBar()->showMessage("Ready");
+    setLedColour(Qt::green);
+}
 
 // *****************************************************************************
 // Function     [ read ]

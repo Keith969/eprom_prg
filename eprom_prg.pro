@@ -36,12 +36,14 @@ INCLUDEPATH += . \
 HEADERS += \
     hexFile.h \
     guiMainWindow.h \
+    initThread.h \
     qLedWidget.h \
     readThread.h
 
 SOURCES += \
     hexFile.cpp \
     guiMainWindow.cpp \
+    initThread.cpp \
     main.cpp \
     qLedWidget.cpp \
     readThread.cpp

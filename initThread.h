@@ -1,9 +1,9 @@
-#ifndef READTHREAD_H
-#define READTHREAD_H
+#ifndef INITTHREAD_H
+#define INITTHREAD_H
 
 // *****************************************************************************
-// File         [ ReadThread.h ]
-// Description  [ Implementation of the readThread class ]
+// File         [ initThread.h ]
+// Description  [ Implementation of the initThread class ]
 // Author       [ Keith Sabine ]
 // *****************************************************************************
 
@@ -12,23 +12,23 @@
 #include <QWaitCondition>
 
 // *****************************************************************************
-// Class        [ readThread ]
+// Class        [ initThread ]
 // Description  [ ]
 // *****************************************************************************
-class readThread : public QThread
+class initThread : public QThread
 {
     Q_OBJECT
 
 public:
-    explicit                readThread(QObject *parent = nullptr);
-                            ~readThread();
+    explicit                initThread(QObject *parent = nullptr);
+                            ~initThread();
 
     void                    transaction(const QString &portName,
-                                            const QString &request,
-                                            const QString &devType,
-                                            int waitTimeout=10000,
-                                            int baudRate=115200,
-                                            int flowControl=0);
+                                const QString &request,
+                                const QString &devType,
+                                int waitTimeout=10000,
+                                int baudRate=115200,
+                                int flowControl=0);
     size_t                  bytesSent() {return m_bytesSent;}
     size_t                  bytesReceived() {return m_bytesReceived;}
 
@@ -52,4 +52,4 @@ private:
     size_t                  m_bytesReceived;
 };
 
-#endif /* READTHREAD_H */
+#endif /* INITTHREAD_H */
