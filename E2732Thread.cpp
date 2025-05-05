@@ -55,6 +55,10 @@ E2732Thread::transaction(const QString& portName,
     m_bytesReceived = 0;
     m_devType = devType;
     m_HexFile = file;
+
+    if (!this->isRunning()) {
+        start();
+    }
 }
 
 // *****************************************************************************

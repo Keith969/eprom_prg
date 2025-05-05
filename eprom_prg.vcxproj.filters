@@ -87,7 +87,7 @@
     <ClCompile Include="E2708Thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TSM2716Thread.cpp">
+    <ClCompile Include="TMS2716Thread.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="E2716Thread.cpp">

@@ -124,7 +124,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="qLedWidget.cpp" />
     <ClCompile Include="readThread.cpp" />
-    <ClCompile Include="TSM2716Thread.cpp" />
+    <ClCompile Include="TMS2716Thread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="E2532Thread.h" />

@@ -538,7 +538,6 @@ guiMainWindow::write()
                 baudRate,
                 flowControl,
                 m_HexFile);
-            write_thread.start();
         }
 
         else if (devType == "2708") {
@@ -561,7 +560,6 @@ guiMainWindow::write()
                 baudRate,
                 flowControl,
                 m_HexFile);
-            write_thread.start();
         }
 
         else if (devType == "TMS2716") {
@@ -584,7 +582,6 @@ guiMainWindow::write()
                 baudRate,
                 flowControl,
                 m_HexFile);
-            write_thread.start();
         }
 
         else if (devType == "2716") {
@@ -607,7 +604,6 @@ guiMainWindow::write()
                 baudRate,
                 flowControl,
                 m_HexFile);
-            write_thread.start();
         }
 
         else if (devType == "2532") {
@@ -630,7 +626,6 @@ guiMainWindow::write()
                 baudRate,
                 flowControl,
                 m_HexFile);
-            write_thread.start();
         }
 
         else if (devType == "2732") {
@@ -653,7 +648,6 @@ guiMainWindow::write()
                 baudRate,
                 flowControl,
                 m_HexFile);
-            write_thread.start();
         }
     }
     else {
