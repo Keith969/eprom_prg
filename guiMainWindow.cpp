@@ -13,14 +13,6 @@
 #include <chrono>
 #include <thread>
 
-#define DEV_2716 0
-#define DEV_2732 1
-#define DEV_2532 2
-#define DEV_2708 3
-#define DEV_T2716 4
-#define DEV_8755 5
-#define DEV_8748 6
-
 // *****************************************************************************
 // Function     [ constructor ]
 // Description  [ ]
@@ -227,9 +219,28 @@ guiMainWindow::getFlowControl()
 void
 guiMainWindow::reset()
 {
+    QString portName = ui.serialPort->currentText();
+    int32_t timeout = ui.timeOut->value() * 1000;
+    int32_t baudRate = ui.baudRate->currentText().toInt();
+    int32_t flowControl = getFlowControl();
+    QString devType = ui.deviceType->currentText();
+
+    QSerialPort serial;
+
+    serial.setPortName(portName);
+    serial.setBaudRate(baudRate);
+    serial.setFlowControl((QSerialPort::FlowControl)flowControl);
+
+    if (!serial.open(QIODevice::ReadWrite)) {
+        clearText();
+        appendText(QString("Can't open %1, error code %2").arg(portName).arg(serial.error()));
+        return;
+    }
+
     // Send the PIC a reset cmd
-    m_serialPort->write(CMD_RSET);
-    m_serialPort->flush();
+    serial.write(CMD_RSET);
+    serial.flush();
+    serial.close();
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
     m_initOK = false;
 
@@ -241,11 +252,6 @@ guiMainWindow::reset()
     ui.resetButton->setEnabled(false);
     ui.initButton->setEnabled(true);
 
-    if (m_serialPort) {
-        m_serialPort->close();
-        delete m_serialPort;
-        m_serialPort = nullptr;
-    }
     clearText();
     statusBar()->showMessage("Ready");
 }
@@ -257,6 +263,7 @@ guiMainWindow::reset()
 void
 guiMainWindow::init()
 {
+#if 0
     QString portName = ui.serialPort->currentText();
     int32_t timeout = ui.timeOut->value() * 1000;
     int32_t baudRate = ui.baudRate->currentText().toInt();
@@ -269,23 +276,23 @@ guiMainWindow::init()
     }
     else {
         statusBar()->showMessage(QString("Status: Connecting to port %1.")
-                                     .arg(portName));
+            .arg(portName));
 
         // Set the serial port
         m_serialPort = new QSerialPort(this);
         m_serialPort->setPortName(portName);
         m_serialPort->setBaudRate(baudRate);
-        m_serialPort->setFlowControl((QSerialPort::FlowControl) flowControl);
+        m_serialPort->setFlowControl((QSerialPort::FlowControl)flowControl);
 
         // Now open the port
         if (!m_serialPort->open(QIODevice::ReadWrite)) {
-            appendText( QString("Can't open %1, error code %2").arg(portName).arg(m_serialPort->error()) );
+            appendText(QString("Can't open %1, error code %2").arg(portName).arg(m_serialPort->error()));
             statusBar()->showMessage("Ready");
             return;
         }
 
         statusBar()->showMessage(QString("Status: Connected to port %1.")
-                                     .arg(portName));
+            .arg(portName));
 
         setLedColour(Qt::red);
         qApp->processEvents();
@@ -311,9 +318,9 @@ guiMainWindow::init()
 
                 // The response string should be the baud rate info
                 clearText();
-                bool ok=true;
-                int32_t val=20.0e6 / (4 * (response.toInt(&ok) + 1));
-                if (std::abs(100*(val - baudRate)/baudRate) < 5) {
+                bool ok = true;
+                int32_t val = 20.0e6 / (4 * (response.toInt(&ok) + 1));
+                if (std::abs(100 * (val - baudRate) / baudRate) < 5) {
                     QString ss = QString("Initialised serial link to %1 baud").arg(baudRate);
                     appendText(ss);
                 }
@@ -336,10 +343,12 @@ guiMainWindow::init()
                 else {
                     serialError(QString("Failed to initialise serial link to %1 baud").arg(baudRate));
                 }
-            } else {
+            }
+            else {
                 serialTimeout(QString("Read baud rate timeout %1").arg(QTime::currentTime().toString()));
             }
-        } else {
+        }
+        else {
             serialTimeout(QString("Send init brg timeout %1").arg(QTime::currentTime().toString()));
         }
     }
@@ -400,7 +409,8 @@ guiMainWindow::init()
             else {
                 serialError(QString("Failed to write %1 bytes)").arg(requestData.size()));
             }
-        } else {
+        }
+        else {
             serialTimeout(QString("Read devType timeout %1").arg(QTime::currentTime().toString()));
         }
         appendText(QString("Set device type to %1").arg(m_devType));
@@ -410,17 +420,94 @@ guiMainWindow::init()
     setLedColour(Qt::green);
 }
 
+#else
+    QString portName = ui.serialPort->currentText();
+    int32_t timeout = ui.timeOut->value() * 1000;
+    int32_t baudRate = ui.baudRate->currentText().toInt();
+    int32_t flowControl = getFlowControl();
+    QString devType = ui.deviceType->currentText();
+
+    if (m_initOK) {
+        QMessageBox::warning(this, "Initialisation", "Serial link already set up!", QMessageBox::Ok);
+    }
+    else {
+        statusBar()->showMessage(QString("Status: Connecting to port %1.").arg(portName));
+        setLedColour(Qt::red);
+        qApp->processEvents();
+    }
+
+    initThread init_thread;
+    QObject::connect(&init_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
+    QObject::connect(&init_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
+    QObject::connect(&init_thread, SIGNAL(response(const QString&)), this, SLOT(initResponse(const QString&)));
+    QObject::connect(&init_thread, SIGNAL(type(const QString&)), this, SLOT(typeResponse(const QString&)));
+    init_thread.transaction(portName,
+                            CMD_INIT,
+                            devType,
+                            timeout,
+                            baudRate,
+                            flowControl);
+    init_thread.start();
+
+#endif
+}
+
 // *****************************************************************************
 // Function     [ initResponse ]
-// Description  [ ]
+// Description  [ The response string should be the baud rate info ]
 // *****************************************************************************
 void
 guiMainWindow::initResponse(const QString &s)
 {
+    int32_t baudRate = ui.baudRate->currentText().toInt();
+
     clearText();
+    bool ok = true;
+    int32_t val = 20.0e6 / (4 * (s.toInt(&ok) + 1));
+    if (std::abs(100 * (val - baudRate) / baudRate) < 5) {
+        QString ss = QString("Initialised serial link to %1 baud").arg(baudRate);
+        appendText(ss);
+    }
+    else {
+        QString ss = QString("Error, serial link not %1 baud").arg(baudRate);
+        appendText(ss);
+    }
+    m_initOK = true;
+
+    // Enable the buttons
+    ui.checkButton->setEnabled(true);
+    ui.readButton->setEnabled(true);
+    ui.writeButton->setEnabled(true);
+    ui.verifyButton->setEnabled(true);
+    ui.initButton->setEnabled(false);
+
+    if (ok == true) {
+        statusBar()->showMessage("Initialise OK");
+    }
+    else {
+        serialError(QString("Failed to initialise serial link to %1 baud").arg(baudRate));
+    }
+
     appendText(s);
     statusBar()->showMessage("Ready");
     setLedColour(Qt::green);
+}
+
+// *****************************************************************************
+// Function     [ typeResponse ]
+// Description  [ ]
+// *****************************************************************************
+void
+guiMainWindow::typeResponse(const QString& s)
+{
+    if (s == "OK") {
+        statusBar()->showMessage("Write OK");
+        appendText(QString("Set device type to %1").arg(m_devType));
+    }
+    else {
+        serialError(QString("Failed to write %1 bytes)").arg(s.size()));
+    }
+    
 }
 
 // *****************************************************************************

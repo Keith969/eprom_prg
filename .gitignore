@@ -3,3 +3,6 @@ GeneratedFiles/*
 Makefile
 eprom_prg.pro.user
 release/*
+.vs
+eprom_prg
+x64

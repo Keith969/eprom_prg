@@ -75,6 +75,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies);$(QTDIR64)/lib/Qt6Cored.lib;$(QTDIR64)/lib/Qt6Guid.lib;$(QTDIR64)/lib/Qt6Widgetsd.lib;$(QTDIR64)/lib/Qt6SerialPortd.lib</AdditionalDependencies>
+      <IgnoreSpecificDefaultLibraries>MSVCRTD</IgnoreSpecificDefaultLibraries>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>
@@ -114,12 +115,14 @@
   <ItemGroup>
     <ClCompile Include="guiMainWindow.cpp" />
     <ClCompile Include="hexFile.cpp" />
+    <ClCompile Include="initThread.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="qLedWidget.cpp" />
     <ClCompile Include="readThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hexFile.h" />
+    <QtMoc Include="initThread.h" />
     <QtMoc Include="readThread.h" />
     <QtMoc Include="qLedWidget.h" />
   </ItemGroup>

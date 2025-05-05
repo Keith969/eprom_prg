@@ -11,6 +11,25 @@
 #include <QThread>
 #include <QWaitCondition>
 
+// Cmds for PIC
+#define CMD_DONE "$0"
+#define CMD_READ "$1"
+#define CMD_WRTE "$2"
+#define CMD_CHEK "$3"
+#define CMD_IDEN "$4"
+#define CMD_TYPE "$5"
+#define CMD_RSET "$9"
+#define CMD_INIT "U"
+
+// Device type codes
+#define DEV_2716  0
+#define DEV_2732  1
+#define DEV_2532  2
+#define DEV_2708  3
+#define DEV_T2716 4
+#define DEV_8755  5
+#define DEV_8748  6
+
 // *****************************************************************************
 // Class        [ initThread ]
 // Description  [ ]
@@ -34,6 +53,7 @@ public:
 
 signals:
     void                    response(const QString &s);
+    void                    type(const QString& s);
     void                    error(const QString &s);
     void                    timeout(const QString &s);
 

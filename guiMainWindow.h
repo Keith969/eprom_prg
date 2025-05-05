@@ -10,19 +10,10 @@
 #include <QtWidgets/QMainWindow>
 #include <QSerialPort>
 #include "ui_guiMainWindow.h"
+#include "initThread.h"
 #include "hexFile.h"
 #include "qLedWidget.h"
 #include "readThread.h"
-
-#define CMD_DONE "$0"
-#define CMD_READ "$1"
-#define CMD_WRTE "$2"
-#define CMD_CHEK "$3"
-#define CMD_IDEN "$4"
-#define CMD_TYPE "$5"
-#define CMD_RSET "$9"
-#define CMD_INIT "U"
-
 
 // *****************************************************************************
 // Class        [ guiMainWindow ]
@@ -47,14 +38,20 @@ public slots:
     void                   verify();
     void                   reset();
 
+    // General error slots
     void                   serialError(const QString &);
     void                   serialTimeout(const QString &);
 
-    void                   readResponse(const QString&);
+    // Slots to receive cmd responses
+    void                   readResponse(const QString &);
+    void                   initResponse(const QString &);
+    void                   typeResponse(const QString &);
 
+    // Text window slots
     void                   appendText(const QString& s) { ui.textEdit->append(s); }
     void                   clearText() { ui.textEdit->clear(); }
 
+    // LED control slots
     void                   setLedPower(bool pwr) { m_ledWidget->setPower(pwr); }
     void                   setLedColour(const QColor& color) { m_ledWidget->setColour(color); m_ledWidget->update(); }
 

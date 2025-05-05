@@ -60,9 +60,6 @@ readThread::transaction(const QString &portName,
 void
 readThread::run()
 {
-    m_mutex.lock();
-    m_mutex.unlock();
-
     QSerialPort serial;
 
     if (m_portName.isEmpty()) {
@@ -92,14 +89,17 @@ readThread::run()
         // read response from the PIC
         if (serial.waitForReadyRead(m_waitTimeout)) {
 
+            // Try and read some data
             QByteArray responseData = serial.readAll();
 
+            // ... and wait for rest of the data.
             while (serial.waitForReadyRead(100)) {
                 responseData += serial.readAll();
             }
 
             const QString response = QString::fromUtf8(responseData);
             emit this->response(response);
+
         } else {
             emit timeout(tr("Wait read response timeout %1")
                             .arg(QTime::currentTime().toString()));
