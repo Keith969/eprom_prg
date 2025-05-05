@@ -18,6 +18,7 @@
 E2732Thread::E2732Thread(QObject* parent) :
     QThread(parent)
 {
+    moveToThread(this);
 }
 
 // *****************************************************************************
@@ -45,7 +46,6 @@ E2732Thread::transaction(const QString& portName,
     int flowControl,
     hexFile* file)
 {
-    //const QMutexLocker locker(&m_mutex);
     m_portName = portName;
     m_waitTimeout = waitTimeout;
     m_baudrate = baudRate;
