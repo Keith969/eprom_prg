@@ -316,20 +316,13 @@ guiMainWindow::initResponse(const QString &s)
     }
     m_initOK = true;
 
-    // Enable the buttons
-    ui.checkButton->setEnabled(true);
-    ui.readButton->setEnabled(true);
-    ui.writeButton->setEnabled(true);
-    ui.verifyButton->setEnabled(true);
-    ui.resetButton->setEnabled(true);
-    ui.initButton->setEnabled(false);
-
     if (ok == true) {
         // Enable the buttons
         ui.checkButton->setEnabled(true);
         ui.readButton->setEnabled(true);
         ui.writeButton->setEnabled(true);
         ui.verifyButton->setEnabled(true);
+        ui.resetButton->setEnabled(true);
         ui.initButton->setEnabled(false);
         statusBar()->showMessage("Initialise OK");
     }
@@ -526,7 +519,6 @@ guiMainWindow::write()
                 appendText("HEX file size is not 1024 bytes!\n");
                 return;
             }
-
 
             QObject::connect(&e8755_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
             QObject::connect(&e8755_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
