@@ -63,3 +63,4 @@ SOURCES += \
 FORMS += \
     guiMainWindow.ui
 
+ICON = chip.icns
