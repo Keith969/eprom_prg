@@ -64,3 +64,4 @@ FORMS += \
     guiMainWindow.ui
 
 ICON = chip.icns
+RC_ICONS = chip.ico
