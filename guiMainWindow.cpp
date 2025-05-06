@@ -344,13 +344,13 @@ guiMainWindow::initResponse(const QString &s)
 void
 guiMainWindow::typeResponse(const QString& s)
 {
+    QString devType = ui.deviceType->currentText();
     if (s == "OK") {
-        QString devType = ui.deviceType->currentText();
         statusBar()->showMessage("Init OK");
         appendText(QString("Set device type to %1").arg(devType));
     }
     else {
-        serialError(QString("Failed to write %1 bytes)").arg(s.size()));
+        serialError(QString("Bad device type %1").arg(devType));
     }
     
     setLedColour(Qt::green);
