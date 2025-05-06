@@ -83,6 +83,7 @@ guiMainWindow::guiMainWindow(QWidget *parent)
     m_progressBar->setMinimum(0);
     m_progressBar->setMaximum(100);
     statusBar()->insertPermanentWidget(2, m_progressBar);
+    m_progressBar->hide();
 
     m_HexFile = new hexFile;
     m_HexFile->setMainWindow(this);
@@ -768,6 +769,7 @@ guiMainWindow::writeResponse(const QString &s)
         serialError(QString("Failed to write %1 bytes)").arg(byte_count));
     }
     setLedColour(Qt::green);
+    m_progressBar->hide();
 }
 
 // *****************************************************************************

@@ -10,7 +10,6 @@
 #include <QTime>
 
 #define CMD_WRTE "$2"
-#define BYTE_COUNT 2048
 
 // *****************************************************************************
 // Function     [ constructor ]
@@ -52,10 +51,12 @@ E8755Thread::transaction(const QString& portName,
     m_baudrate = baudRate;
     m_flowControl = flowControl;
     m_request = request;
-    m_bytesSent = 0;
-    m_bytesReceived = 0;
     m_devType = devType;
     m_HexFile = file;
+    if (devType == "8755")
+        m_byteCount = 2048;
+    else if (devType == "8748")
+        m_byteCount = 1024;
 
     if (! this->isRunning()) {
         start();
@@ -113,8 +114,8 @@ E8755Thread::run()
             serial.write(c);
             serial.flush();
             byte_count++;
-            if (byte_count % (BYTE_COUNT / 100) == 0) {
-                emit progress(byte_count * 100 / BYTE_COUNT);
+            if (byte_count % (m_byteCount / 100) == 0) {
+                emit progress(byte_count * 100 / m_byteCount);
             }
         }
     }

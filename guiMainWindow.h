@@ -57,7 +57,7 @@ public slots:
     void                   writeResponse(const QString&);
     void                   verifyResponse(const QString&);
 
-    void                   initProgress() { m_progressBar->reset(); }
+    void                   initProgress() { m_progressBar->reset(); m_progressBar->show(); }
     void                   updateProgress(int32_t val) { m_progressBar->setValue(val); }
 
     // Text window slots

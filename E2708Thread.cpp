@@ -10,7 +10,6 @@
 #include <QTime>
 
 #define CMD_WRTE "$2"
-#define BYTE_COUNT 1024
 
 // *****************************************************************************
 // Function     [ constructor ]
@@ -52,10 +51,9 @@ E2708Thread::transaction(const QString& portName,
     m_baudrate = baudRate;
     m_flowControl = flowControl;
     m_request = request;
-    m_bytesSent = 0;
-    m_bytesReceived = 0;
     m_devType = devType;
     m_HexFile = file;
+    m_byteCount = 1024;
 
     if (!this->isRunning()) {
         start();

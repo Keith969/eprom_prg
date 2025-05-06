@@ -48,8 +48,6 @@ initThread::transaction(const QString &portName,
     m_baudrate = baudRate;
     m_flowControl = flowControl;
     m_request = request;
-    m_bytesSent = 0;
-    m_bytesReceived = 0;
     m_devType = devType;
 
     if (!this->isRunning()) {

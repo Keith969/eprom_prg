@@ -31,8 +31,6 @@ public:
                                         int baudRate = 115200,
                                         int flowControl = 1,
                                         hexFile* file=nullptr);
-    size_t                  bytesSent() { return m_bytesSent; }
-    size_t                  bytesReceived() { return m_bytesReceived; }
 
 signals:
     void                    response(const QString& s);
@@ -52,9 +50,8 @@ private:
     QWaitCondition          m_cond;
     int32_t                 m_baudrate = 115200;
     int32_t                 m_flowControl = 0;
-    size_t                  m_bytesSent;
-    size_t                  m_bytesReceived;
     hexFile               * m_HexFile;
+    int16_t                 m_byteCount;
 };
 
 #endif /* TMS2716THREAD_H */
