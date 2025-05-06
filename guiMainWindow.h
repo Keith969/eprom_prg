@@ -9,6 +9,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include <QSerialPort>
+#include <QProgressBar>
 #include "ui_guiMainWindow.h"
 #include "initThread.h"
 #include "hexFile.h"
@@ -56,6 +57,9 @@ public slots:
     void                   writeResponse(const QString&);
     void                   verifyResponse(const QString&);
 
+    void                   initProgress() { m_progressBar->reset(); }
+    void                   updateProgress(int32_t val) { m_progressBar->setValue(val); }
+
     // Text window slots
     void                   appendText(const QString& s) {
         ui.textEdit->append(s);
@@ -80,6 +84,9 @@ private:
     QStatusBar             m_statusBar;
     QLabel                 m_statusMsg;
     QLedWidget           * m_ledWidget;
+
+    // Progress bar
+    QProgressBar         * m_progressBar;
 
     bool                   m_initOK;
 

@@ -75,9 +75,14 @@ guiMainWindow::guiMainWindow(QWidget *parent)
     m_ledWidget = new QLedWidget;
     setLedColour(Qt::green);
     setLedPower(true);
-    statusBar()->insertPermanentWidget(1, m_ledWidget);
 
+    statusBar()->insertPermanentWidget(1, m_ledWidget);
     statusBar()->showMessage("Ready");
+
+    m_progressBar = new QProgressBar;
+    m_progressBar->setMinimum(0);
+    m_progressBar->setMaximum(100);
+    statusBar()->insertPermanentWidget(2, m_progressBar);
 
     m_HexFile = new hexFile;
     m_HexFile->setMainWindow(this);
@@ -504,6 +509,7 @@ guiMainWindow::write()
 
         statusBar()->showMessage(QString("Writing to DUT"));
         setLedColour(Qt::red);
+        initProgress();
         qApp->processEvents();
 
         if (devType == "8755" || devType == "8748") {
@@ -523,6 +529,7 @@ guiMainWindow::write()
             QObject::connect(&e8755_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
             QObject::connect(&e8755_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e8755_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            QObject::connect(&e8755_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
             e8755_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -544,6 +551,7 @@ guiMainWindow::write()
             QObject::connect(&e2708_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
             QObject::connect(&e2708_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e2708_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            QObject::connect(&e2708_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
             e2708_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -565,6 +573,7 @@ guiMainWindow::write()
             QObject::connect(&t2716_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
             QObject::connect(&t2716_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&t2716_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            QObject::connect(&t2716_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
             t2716_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -586,6 +595,7 @@ guiMainWindow::write()
             QObject::connect(&e2716_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
             QObject::connect(&e2716_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e2716_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            QObject::connect(&e2716_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
             e2716_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -607,6 +617,7 @@ guiMainWindow::write()
             QObject::connect(&e2532_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
             QObject::connect(&e2532_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e2532_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            QObject::connect(&e2532_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
             e2532_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -628,6 +639,7 @@ guiMainWindow::write()
             QObject::connect(&e2732_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));
             QObject::connect(&e2732_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e2732_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
+            QObject::connect(&e2732_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
             e2732_thread.transaction(portName,
                 CMD_READ,
                 devType,

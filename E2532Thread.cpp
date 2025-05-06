@@ -10,6 +10,7 @@
 #include <QTime>
 
 #define CMD_WRTE "$2"
+#define BYTE_COUNT 4096
 
 // *****************************************************************************
 // Function     [ constructor ]
@@ -112,6 +113,9 @@ E2532Thread::run()
             serial.write(c);
             serial.flush();
             byte_count++;
+            if (byte_count % (BYTE_COUNT / 100) == 0) {
+                emit progress(byte_count * 100 / BYTE_COUNT);
+            }
         }
     }
 

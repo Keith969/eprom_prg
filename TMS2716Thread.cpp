@@ -10,6 +10,7 @@
 #include <QTime>
 
 #define CMD_WRTE "$2"
+#define BYTE_COUNT 2048
 
 // *****************************************************************************
 // Function     [ constructor ]
@@ -92,6 +93,7 @@ T2716Thread::run()
     for (int32_t j = 0; j < 100; ++j) {
 
         int32_t byte_count = 0;
+        emit progress(j);
 
         // Send the cmd, followed by the data.
         QString request(CMD_WRTE);

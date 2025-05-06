@@ -39,6 +39,7 @@ signals:
     void                    error(const QString& s);
     void                    timeout(const QString& s);
     void                    byteCount(int32_t c);
+    void                    progress(int32_t val);
 
 private:
     void                    run() override;
