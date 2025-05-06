@@ -75,7 +75,8 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <AdditionalDependencies>%(AdditionalDependencies);$(QTDIR64)/lib/Qt6Cored.lib;$(QTDIR64)/lib/Qt6Guid.lib;$(QTDIR64)/lib/Qt6Widgetsd.lib;$(QTDIR64)/lib/Qt6SerialPortd.lib</AdditionalDependencies>
-      <IgnoreSpecificDefaultLibraries>MSVCRTD</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>
@@ -139,6 +140,9 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="E2708Thread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="chip.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
