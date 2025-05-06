@@ -54,7 +54,7 @@ guiMainWindow::guiMainWindow(QWidget *parent)
         QString portName = info.portName();
         // Lets ignore bluetooth stuff, we don't use that
         if (! portName.contains("bluetooth", Qt::CaseInsensitive) && ! portName.contains("BLTH", Qt::CaseInsensitive)) {
-            ui.serialPort->addItem(info.portName());
+            ui.serialPort->addItem(portName);
         }
     }
 
@@ -98,7 +98,7 @@ guiMainWindow::guiMainWindow(QWidget *parent)
 }
 
 // *****************************************************************************
-// Function     [ cdestructor ]
+// Function     [ destructor ]
 // Description  [ ]
 // *****************************************************************************
 guiMainWindow::~guiMainWindow()
