@@ -59,11 +59,10 @@ public slots:
 
     void                   initProgress() { m_progressBar->reset(); m_progressBar->show(); }
     void                   updateProgress(int32_t val) { m_progressBar->setValue(val); }
+    void                   writeFinished();
 
     // Text window slots
-    void                   appendText(const QString& s) {
-        ui.textEdit->append(s);
-    }
+    void                   appendText(const QString& s) { ui.textEdit->append(s); }
     void                   clearText() { ui.textEdit->clear(); }
 
     // LED control slots

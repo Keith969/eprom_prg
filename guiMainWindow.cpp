@@ -531,6 +531,7 @@ guiMainWindow::write()
             QObject::connect(&e8755_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e8755_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
             QObject::connect(&e8755_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
+            QObject::connect(&e8755_thread, SIGNAL(finished()), this, SLOT(writeFinished()));
             e8755_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -553,6 +554,7 @@ guiMainWindow::write()
             QObject::connect(&e2708_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e2708_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
             QObject::connect(&e2708_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
+            QObject::connect(&e2708_thread, SIGNAL(finished()), this, SLOT(writeFinished()));
             e2708_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -575,6 +577,7 @@ guiMainWindow::write()
             QObject::connect(&t2716_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&t2716_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
             QObject::connect(&t2716_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
+            QObject::connect(&t2716_thread, SIGNAL(finished()), this, SLOT(writeFinished()));
             t2716_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -597,6 +600,7 @@ guiMainWindow::write()
             QObject::connect(&e2716_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e2716_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
             QObject::connect(&e2716_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
+            QObject::connect(&e2716_thread, SIGNAL(finished()), this, SLOT(writeFinished()));
             e2716_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -619,6 +623,7 @@ guiMainWindow::write()
             QObject::connect(&e2532_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e2532_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
             QObject::connect(&e2532_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
+            QObject::connect(&e2532_thread, SIGNAL(finished()), this, SLOT(writeFinished()));
             e2532_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -641,6 +646,7 @@ guiMainWindow::write()
             QObject::connect(&e2732_thread, SIGNAL(timeout(const QString&)), this, SLOT(serialTimeout(const QString&)));
             QObject::connect(&e2732_thread, SIGNAL(response(const QString&)), this, SLOT(writeResponse(const QString&)));
             QObject::connect(&e2732_thread, SIGNAL(progress(int32_t)), this, SLOT(updateProgress(int32_t)));
+            QObject::connect(&e2732_thread, SIGNAL(finished()), this, SLOT(writeFinished()));
             e2732_thread.transaction(portName,
                 CMD_READ,
                 devType,
@@ -654,6 +660,17 @@ guiMainWindow::write()
         clearText();
         appendText("No HEX data - please open a HEX file!\n");
     }
+}
+
+// *****************************************************************************
+// Function     [ writeFinished ]
+// Description  [ Wite thread has finished ]
+// *****************************************************************************
+void
+guiMainWindow::writeFinished()
+{
+    setLedColour(Qt::green);
+    m_progressBar->hide();
 }
 
 // *****************************************************************************
@@ -768,8 +785,6 @@ guiMainWindow::writeResponse(const QString &s)
         int32_t byte_count = bc.at(1).toInt();
         serialError(QString("Failed to write %1 bytes)").arg(byte_count));
     }
-    setLedColour(Qt::green);
-    m_progressBar->hide();
 }
 
 // *****************************************************************************
