@@ -42,14 +42,16 @@
     <QtModules>
     </QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
-    <QtHeaderSearchPath>$(QTDIR64)\include;$(QTDIR64)\include\QtCore;$(QTDIR64)\include\QtGui;$(QTDIR64)\include\QtWidgets;$(QTDIR)\include\QtSerialPort</QtHeaderSearchPath>
+    <QtHeaderSearchPath>$(QTDIR64)\include;$(QTDIR64)\include\QtCore;$(QTDIR64)\include\QtGui;$(QTDIR64)\include\QtWidgets;$(QTDIR64)\include\QtSerialPort</QtHeaderSearchPath>
     <QtLibrarySearchPath>$(QTDIR64)\lib</QtLibrarySearchPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
-    <QtInstall>6.6.1</QtInstall>
+    <QtInstall>Qt_6.9.0-x64</QtInstall>
     <QtModules>
     </QtModules>
     <QtBuildConfig>debug</QtBuildConfig>
+    <QtHeaderSearchPath>$(QTDIR64)\include;$(QTDIR64)\include\QtCore;$(QTDIR64)\include\QtGui;$(QTDIR64)\include\QtWidgets;$(QTDIR64)\include\QtSerialPort</QtHeaderSearchPath>
+    <QtLibrarySearchPath>$(QTDIR64)\lib</QtLibrarySearchPath>
   </PropertyGroup>
   <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
     <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
@@ -74,14 +76,20 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
-      <AdditionalDependencies>%(AdditionalDependencies);$(QTDIR64)/lib/Qt6Cored.lib;$(QTDIR64)/lib/Qt6Guid.lib;$(QTDIR64)/lib/Qt6Widgetsd.lib;$(QTDIR64)/lib/Qt6SerialPortd.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(QTDIR64)/lib/Qt6Cored.lib;$(QTDIR64)/lib/Qt6Guid.lib;$(QTDIR64)/lib/Qt6Widgetsd.lib;$(QTDIR64)/lib/Qt6SerialPortd.lib</AdditionalDependencies>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Link>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);$(QTDIR64)/lib/Qt6Core.lib;$(QTDIR64)/lib/Qt6Gui.lib;$(QTDIR64)/lib/Qt6Widgets.lib;$(QTDIR64)/lib/Qt6SerialPort.lib</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
@@ -99,12 +107,12 @@
     <ClCompile>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

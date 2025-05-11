@@ -50,7 +50,7 @@ guiMainWindow::guiMainWindow(QWidget *parent)
 
     // Stuff the serial port combo box
     const auto infos = QSerialPortInfo::availablePorts();
-    for (const QSerialPortInfo &info : infos) {
+    for (const QSerialPortInfo info : infos) {
         QString portName = info.portName();
         // Lets ignore bluetooth stuff, we don't use that
         if (! portName.contains("bluetooth", Qt::CaseInsensitive) && ! portName.contains("BLTH", Qt::CaseInsensitive)) {
