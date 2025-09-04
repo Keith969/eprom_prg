@@ -463,7 +463,7 @@ guiMainWindow::checkResponse(const QString &response)
             bool ok = false;
             uint8_t dev_chr = ss.toInt(&ok, 16);
             // Compare with 0xff for all but 8748 which erases to 0x00
-            if (devType == "8748") {
+            if (devType == "8748" || devType == "8749") {
                 if (0x00 != dev_chr) {
                     fails++;
                 }
@@ -513,7 +513,7 @@ guiMainWindow::write()
         initProgress();
         qApp->processEvents();
 
-        if (devType == "8755" || devType == "8748") {
+        if (devType == "8755" || devType == "8748" || devType == "8749") {
 
             // Check hex file size is 2kb
             if ((devType == "8755") && (m_HexFile->size() != 2048)) {
@@ -522,6 +522,11 @@ guiMainWindow::write()
                 return;
             }
             if ((devType == "8748") && (m_HexFile->size() != 1024)) {
+                clearText();
+                appendText("HEX file size is not 1024 bytes!\n");
+                return;
+            }
+            if ((devType == "8749") && (m_HexFile->size() != 2048)) {
                 clearText();
                 appendText("HEX file size is not 1024 bytes!\n");
                 return;
