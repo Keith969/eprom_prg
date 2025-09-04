@@ -1,5 +1,6 @@
 # eprom_prg
-A programmer for EPROMs.
+A programmer for EPROMs. This works with the various hardware-specific boards
+e.g. 2708prg, 2716prg, 8755prg.
 
 This comes in 3 parts:
 1) The PC (or Mac, Linux) program that reads/writes HEX format files
