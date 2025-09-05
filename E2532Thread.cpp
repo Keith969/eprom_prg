@@ -92,6 +92,11 @@ E2532Thread::run()
     const QByteArray requestData = request.toUtf8();
     serial.write(requestData);
 
+    // Write the size, max 64k. 2 hex chars.
+    uint16_t size = m_HexFile->size();
+    QString asc_size = QString("%1").arg(size, 2, 16, QChar('0'));
+    serial.write(asc_size.toUtf8());
+
     // Send the data as bytes, using pairs of chars.
     std::vector<hexDataChunk> hData = m_HexFile->hexData();
 
@@ -116,29 +121,6 @@ E2532Thread::run()
             }
         }
     }
-
-#if 1 
-    // Changes 050925 KAS to allow writing blanks to fill EPROM
-    // If we wrote less than the EPROM capacity, fill with zeros (87xx)
-    if (m_HexFile->size() < m_byteCount) {
-        for (int8_t i = byte_count; i < m_byteCount; ++i) {
-            const short d = 0x00;
-            QByteArray c = QString("%1").arg(d, 2, 16, QChar('0')).toUtf8();
-            // If RTS is false, sleep
-            //while (m_serialPort->isRequestToSend() == false) {
-            //    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-            //}
-            // Delay sending to the program pulse width, in this case 50mS
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-            serial.write(c);
-            serial.flush();
-            byte_count++;
-            if (byte_count % (m_byteCount / 100) == 0) {
-                emit progress(byte_count * 100 / m_byteCount);
-            }
-        }
-    }
-#endif
 
     // Read response from the PIC
     if (serial.waitForReadyRead(m_waitTimeout)) {
