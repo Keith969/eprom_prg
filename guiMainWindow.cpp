@@ -516,19 +516,19 @@ guiMainWindow::write()
         if (devType == "8755" || devType == "8748" || devType == "8749") {
 
             // Check hex file size is 2kb
-            if ((devType == "8755") && (m_HexFile->size() != 2048)) {
+            if ((devType == "8755") && (m_HexFile->size() > 2048)) {
                 clearText();
-                appendText("HEX file size is not 2048 bytes!\n");
+                appendText("HEX file size is greater than 2048 bytes!\n");
                 return;
             }
-            if ((devType == "8748") && (m_HexFile->size() != 1024)) {
+            if ((devType == "8748") && (m_HexFile->size() > 1024)) {
                 clearText();
-                appendText("HEX file size is not 1024 bytes!\n");
+                appendText("HEX file size is greater than 1024 bytes!\n");
                 return;
             }
-            if ((devType == "8749") && (m_HexFile->size() != 2048)) {
+            if ((devType == "8749") && (m_HexFile->size() > 2048)) {
                 clearText();
-                appendText("HEX file size is not 1024 bytes!\n");
+                appendText("HEX file size is greater than 1024 bytes!\n");
                 return;
             }
 
@@ -549,9 +549,9 @@ guiMainWindow::write()
         else if (devType == "2708") {
 
             // Check hex file size is 1kb
-            if (m_HexFile->size() != 1024) {
+            if (m_HexFile->size() > 1024) {
                 clearText();
-                appendText("HEX file size is not 1024 bytes!\n");
+                appendText("HEX file size is greater than 1024 bytes!\n");
                 return;
             }
 
@@ -572,9 +572,9 @@ guiMainWindow::write()
         else if (devType == "TMS2716") {
 
             // Check hex file size is 2kb
-            if (m_HexFile->size() != 2048) {
+            if (m_HexFile->size() > 2048) {
                 clearText();
-                appendText("HEX file size is not 2048 bytes!\n");
+                appendText("HEX file size is greater than 2048 bytes!\n");
                 return;
             }
 
@@ -595,9 +595,9 @@ guiMainWindow::write()
         else if (devType == "2716") {
 
             // Check hex file size is 2kb
-            if (m_HexFile->size() != 2048) {
+            if (m_HexFile->size() > 2048) {
                 clearText();
-                appendText("HEX file size is not 2048 bytes!\n");
+                appendText("HEX file size is greater than 2048 bytes!\n");
                 return;
             }
 
@@ -618,9 +618,9 @@ guiMainWindow::write()
         else if (devType == "2532") {
 
             // Check hex file size is 4kb
-            if (m_HexFile->size() != 4096) {
+            if (m_HexFile->size() > 4096) {
                 clearText();
-                appendText("HEX file size is not 4096 bytes!\n");
+                appendText("HEX file size is greater than 4096 bytes!\n");
                 return;
             }
 
@@ -641,9 +641,9 @@ guiMainWindow::write()
         else if (devType == "2732") {
 
             // Check hex file size is 4kb
-            if (m_HexFile->size() != 4096) {
+            if (m_HexFile->size() > 4096) {
                 clearText();
-                appendText("HEX file size is not 4096 bytes!\n");
+                appendText("HEX file size is greater than 4096 bytes!\n");
                 return;
             }
 
