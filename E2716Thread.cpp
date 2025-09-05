@@ -117,12 +117,12 @@ E2716Thread::run()
         }
     }
 
-#if 1 // Changes 050925 KAS to allow writing blanks to fill EPROM
-    int16_t size = 2048;
-    // If we wrote less than the EPROM capacity, fill with 1's
-    if (m_HexFile->size() < size) {
-        for (int8_t i = byte_count; i < size; ++i) {
-            const short d = 0xff;
+#if 1 
+    // Changes 050925 KAS to allow writing blanks to fill EPROM
+    // If we wrote less than the EPROM capacity, fill with zeros (87xx)
+    if (m_HexFile->size() < m_byteCount) {
+        for (int8_t i = byte_count; i < m_byteCount; ++i) {
+            const short d = 0x00;
             QByteArray c = QString("%1").arg(d, 2, 16, QChar('0')).toUtf8();
             // If RTS is false, sleep
             //while (m_serialPort->isRequestToSend() == false) {
@@ -134,7 +134,7 @@ E2716Thread::run()
             serial.flush();
             byte_count++;
             if (byte_count % (m_byteCount / 100) == 0) {
-                emit progress(byte_count * 100 / size);
+                emit progress(byte_count * 100 / m_byteCount);
             }
         }
     }
