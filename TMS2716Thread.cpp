@@ -121,6 +121,29 @@ T2716Thread::run()
             }
         }
 
+#if 1 // Changes 050925 KAS to allow writing blanks to fill EPROM
+        int16_t size = 2048;
+        // If we wrote less than the EPROM capacity, fill with 1's
+        if (m_HexFile->size() < size) {
+            for (int8_t i = byte_count; i < size; ++i) {
+                const short d = 0xff;
+                QByteArray c = QString("%1").arg(d, 2, 16, QChar('0')).toUtf8();
+                // If RTS is false, sleep
+                //while (m_serialPort->isRequestToSend() == false) {
+                //    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                //}
+                // Delay sending to the program pulse width, in this case 50mS
+                std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                serial.write(c);
+                serial.flush();
+                byte_count++;
+                if (byte_count % (m_byteCount / 100) == 0) {
+                    emit progress(byte_count * 100 / size);
+                }
+            }
+        }
+#endif
+
         // Read response from the PIC
         if (serial.waitForReadyRead(m_waitTimeout)) {
 
