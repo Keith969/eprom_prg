@@ -118,7 +118,8 @@ initThread::run()
         m_devType == "2708"    ||
         m_devType == "TMS2716" ||
         m_devType == "8755"    ||
-        m_devType == "8748") {
+        m_devType == "8748"    ||
+        m_devType == "8749") {
 
         // Write the cmd
         serial.write(CMD_TYPE);
@@ -139,6 +140,8 @@ initThread::run()
             requestData = QString("5").toUtf8();
         else if (m_devType == "8748")
             requestData = QString("6").toUtf8();
+        else if (m_devType == "8749")
+            requestData = QString("7").toUtf8();
 
         serial.write(requestData);
 

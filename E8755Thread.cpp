@@ -57,6 +57,8 @@ E8755Thread::transaction(const QString& portName,
         m_byteCount = 2048;
     else if (devType == "8748")
         m_byteCount = 1024;
+    else if (devType == "8749")
+        m_byteCount = 2048;
 
     if (! this->isRunning()) {
         start();
