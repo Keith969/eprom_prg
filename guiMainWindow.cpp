@@ -53,9 +53,10 @@ guiMainWindow::guiMainWindow(QWidget *parent)
     const auto infos = QSerialPortInfo::availablePorts();
     for (const QSerialPortInfo info : infos) {
         QString portName = info.portName();
+        QString description = info.description();
         // Lets ignore bluetooth stuff, we don't use that
         if (! portName.contains("bluetooth", Qt::CaseInsensitive) && ! portName.contains("BLTH", Qt::CaseInsensitive)) {
-            ui.serialPort->addItem(portName);
+            ui.serialPort->addItem(portName + QChar(' ') + description);
         }
     }
 
