@@ -37,7 +37,7 @@
              <property name="minimumSize">
               <size>
                <width>150</width>
-               <height>0</height>
+               <height>25</height>
               </size>
              </property>
              <property name="toolTip">
@@ -69,8 +69,8 @@
             <widget class="QComboBox" name="baudRate">
              <property name="minimumSize">
               <size>
-               <width>75</width>
-               <height>0</height>
+               <width>90</width>
+               <height>25</height>
               </size>
              </property>
              <property name="toolTip">
@@ -223,6 +223,12 @@
            </item>
            <item>
             <widget class="QComboBox" name="deviceType">
+             <property name="minimumSize">
+              <size>
+               <width>80</width>
+               <height>25</height>
+              </size>
+             </property>
              <property name="toolTip">
               <string>Set the type of the EPROM</string>
              </property>
@@ -360,8 +366,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>694</width>
-           <height>326</height>
+           <width>688</width>
+           <height>268</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -382,7 +388,7 @@
      <x>0</x>
      <y>0</y>
      <width>716</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

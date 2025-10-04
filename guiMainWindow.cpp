@@ -106,7 +106,7 @@ guiMainWindow::guiMainWindow(QWidget *parent)
     settings.beginGroup("MainWindow");
     const auto geometry = settings.value("geometry", QByteArray()).toByteArray();
     if (geometry.isEmpty()) {
-        setGeometry(200, 200, 676, 308);
+        setGeometry(200, 200, 675, 500);
     }
     else {
         restoreGeometry(geometry);
@@ -159,7 +159,7 @@ guiMainWindow::closeEvent(QCloseEvent* event)
     settings.beginGroup("MainWindow");
 
     settings.setValue("geometry", saveGeometry());
-    QString portName = ui.serialPort->currentText();
+    QString portName = getSerialPortName();
     settings.setValue("portName", portName);
     QString baudRate = ui.baudRate->currentText();
     settings.setValue("baudRate", baudRate);
@@ -167,6 +167,48 @@ guiMainWindow::closeEvent(QCloseEvent* event)
     settings.setValue("flowControl", flowControl);
     settings.setValue("devType", m_devType);
     settings.endGroup();
+}
+
+// *****************************************************************************
+// Function     [ getSerialPortName ]
+// Description  [ ]
+// *****************************************************************************
+QString
+guiMainWindow::getSerialPortName()
+{
+    QString s = ui.serialPort->currentText();
+    QStringList sp = s.split(QChar(' '));
+    return sp.at(0);
+}
+
+// *****************************************************************************
+// Function     [ getBaudRate ]
+// Description  [ ]
+// *****************************************************************************
+int32_t
+guiMainWindow::getBaudRate()
+{
+    return ui.baudRate->currentText().toInt();
+}
+
+// *****************************************************************************
+// Function     [ getTimeOut ]
+// Description  [ ]
+// *****************************************************************************
+int32_t
+guiMainWindow::getTimeOut()
+{
+    return ui.timeOut->value() * 1000;
+}
+
+// *****************************************************************************
+// Function     [ getDeviceType ]
+// Description  [ ]
+// *****************************************************************************
+QString
+guiMainWindow::getDeviceType()
+{
+    return ui.deviceType->currentText();
 }
 
 // *****************************************************************************
@@ -289,8 +331,8 @@ guiMainWindow::getFlowControl()
 void
 guiMainWindow::reset()
 {
-    QString portName = ui.serialPort->currentText();
-    int32_t baudRate = ui.baudRate->currentText().toInt();
+    QString portName = getSerialPortName();
+    int32_t baudRate = getBaudRate();
     int32_t flowControl = getFlowControl();
 
     QSerialPort serial;
@@ -335,11 +377,11 @@ guiMainWindow::reset()
 void
 guiMainWindow::init()
 {
-    QString portName = ui.serialPort->currentText();
-    int32_t timeout = ui.timeOut->value() * 1000;
-    int32_t baudRate = ui.baudRate->currentText().toInt();
+    QString portName = getSerialPortName();
+    int32_t timeout = getTimeOut();
+    int32_t baudRate = getBaudRate();
     int32_t flowControl = getFlowControl();
-    QString devType = ui.deviceType->currentText();
+    QString devType = getDeviceType();
 
     if (m_initOK) {
         QMessageBox::warning(this, "Initialisation", "Serial link already set up!", QMessageBox::Ok);
@@ -437,11 +479,11 @@ guiMainWindow::read()
         qApp->processEvents();
     }
 
-    QString portName = ui.serialPort->currentText();
-    int32_t timeout = ui.timeOut->value() * 1000;
-    int32_t baudRate = ui.baudRate->currentText().toInt();
+    QString portName = getSerialPortName();
+    int32_t timeout = getTimeOut();
+    int32_t baudRate = getBaudRate();
     int32_t flowControl = getFlowControl();
-    QString devType = ui.deviceType->currentText();
+    QString devType = getDeviceType();
 
     readThread read_thread;
     QObject::connect(&read_thread, SIGNAL(error(const QString &)), this, SLOT(serialError(const QString &)));
@@ -487,11 +529,11 @@ guiMainWindow::check()
         qApp->processEvents();
     }
 
-    QString portName = ui.serialPort->currentText();
-    int32_t timeout = ui.timeOut->value() * 1000;
-    int32_t baudRate = ui.baudRate->currentText().toInt();
+    QString portName = getSerialPortName();
+    int32_t timeout = getTimeOut();
+    int32_t baudRate = getBaudRate();
     int32_t flowControl = getFlowControl();
-    QString devType = ui.deviceType->currentText();
+    QString devType = getDeviceType();
 
     readThread read_thread;
     QObject::connect(&read_thread, SIGNAL(error(const QString &)), this, SLOT(serialError(const QString &)));
@@ -566,11 +608,11 @@ guiMainWindow::write()
         return;
     }
     if (m_HexFile->size() > 0) {
-        QString portName = ui.serialPort->currentText();
-        int32_t timeout = ui.timeOut->value() * 1000;
-        int32_t baudRate = ui.baudRate->currentText().toInt();
+        QString portName = getSerialPortName();
+        int32_t timeout = getTimeOut();
+        int32_t baudRate = getBaudRate();
         int32_t flowControl = getFlowControl();
-        QString devType = ui.deviceType->currentText();
+        QString devType = getDeviceType();
 
         statusBar()->showMessage(QString("Writing to DUT"));
         setLedColour(Qt::red);
@@ -759,11 +801,11 @@ guiMainWindow::verify()
         qApp->processEvents();
     }
 
-    QString portName = ui.serialPort->currentText();
-    int32_t timeout = ui.timeOut->value() * 1000;
-    int32_t baudRate = ui.baudRate->currentText().toInt();
+    QString portName = getSerialPortName();
+    int32_t timeout = getTimeOut();
+    int32_t baudRate = getBaudRate();
     int32_t flowControl = getFlowControl();
-    QString devType = ui.deviceType->currentText();
+    QString devType = getDeviceType();
 
     readThread read_thread;
     QObject::connect(&read_thread, SIGNAL(error(const QString&)), this, SLOT(serialError(const QString&)));

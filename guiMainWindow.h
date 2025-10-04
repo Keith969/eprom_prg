@@ -74,6 +74,10 @@ public slots:
 private:
     size_t                 size() {return m_HexFile->size();}
     int32_t                getFlowControl();
+    QString                getSerialPortName();
+    int32_t                getBaudRate();
+    int32_t                getTimeOut();
+    QString                getDeviceType();
 
     // ui
     Ui::guiMainWindowClass ui;
