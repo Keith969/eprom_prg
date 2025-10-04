@@ -15,6 +15,7 @@
 #include <QtWidgets/QFileDialog>
 #include <QtWidgets/QMessageBox>
 #include <QtSerialPort/QSerialPortInfo>
+#include <QSettings>
 
 #include <chrono>
 #include <thread>
@@ -95,6 +96,46 @@ guiMainWindow::guiMainWindow(QWidget *parent)
     ui.writeButton->setEnabled(false);
     ui.verifyButton->setEnabled(false);
     ui.resetButton->setEnabled(false);
+
+    // Restore settings...
+    QCoreApplication::setOrganizationName("Peardrop Desiign Systems");
+    QCoreApplication::setOrganizationDomain("peardrop.co.uk");
+    QCoreApplication::setApplicationName("eprom_prg");
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+    const auto geometry = settings.value("geometry", QByteArray()).toByteArray();
+    if (geometry.isEmpty()) {
+        setGeometry(200, 200, 676, 308);
+    }
+    else {
+        restoreGeometry(geometry);
+    }
+
+    // Baud rate defaults to 115200
+    QString baudRate = settings.value("baudRate", "115200").toByteArray();
+    ui.baudRate->setCurrentText(baudRate);
+
+    // Port name 
+    QString portName = settings.value("portName", ui.serialPort->currentText()).toByteArray();
+    ui.serialPort->setCurrentText(portName);
+    settings.endGroup();
+   
+    // Flow control
+    if (settings.value("flowControl", ui.flowRtsCts->isChecked()).toInt()) {
+        ui.flowRtsCts->setChecked(true);
+    }
+    else {
+        ui.flowNone->setChecked(true);
+    }
+    // Note on Windows, at least for me, flow control must be none.
+#ifdef WIN32
+    ui.flowNone->setChecked(true);
+    ui.groupBox->setEnabled(false);
+#endif
+
+    // Device type
+    m_devType = settings.value("devType", "2716").toByteArray();
+    ui.deviceType->setCurrentText(m_devType);
 }
 
 // *****************************************************************************
@@ -104,6 +145,27 @@ guiMainWindow::guiMainWindow(QWidget *parent)
 guiMainWindow::~guiMainWindow()
 {
     delete m_HexFile;
+}
+
+// *****************************************************************************
+// Function     [ closeEvent ]
+// Description  [ ]
+// *****************************************************************************
+void
+guiMainWindow::closeEvent(QCloseEvent* event)
+{
+    QSettings settings;
+    settings.beginGroup("MainWindow");
+
+    settings.setValue("geometry", saveGeometry());
+    QString portName = ui.serialPort->currentText();
+    settings.setValue("portName", portName);
+    QString baudRate = ui.baudRate->currentText();
+    settings.setValue("baudRate", baudRate);
+    int32_t flowControl = getFlowControl();
+    settings.setValue("flowControl", flowControl);
+    settings.setValue("devType", m_devType);
+    settings.endGroup();
 }
 
 // *****************************************************************************

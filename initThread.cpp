@@ -71,7 +71,7 @@ initThread::run()
 
     serial.setPortName(m_portName);
     serial.setBaudRate(m_baudrate);
-    serial.setFlowControl((QSerialPort::FlowControl)m_flowControl);
+    serial.setFlowControl((QSerialPort::FlowControl) m_flowControl);
 
     if (!serial.open(QIODevice::ReadWrite)) {
         emit error(tr("Can't open %1, error code %2")

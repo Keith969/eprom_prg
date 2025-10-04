@@ -32,6 +32,10 @@ This comes in 3 parts:
    (Make sure this is correct, unfortunately the connector is reversible
    and getting it the wrong way could damage the PIC).
 
+3) Select the serial port for the serial link. On windows this will be a COM
+   port e.g. COM3. On Mac it will be a usb port. Note flow control should not be
+   used on Windows and so is disabled for this platform.
+
 3) Use a jumper on the link for usb power to power the board via USB, else
    without the jumper you can apply 5v via the 'ext pwr' header.
 

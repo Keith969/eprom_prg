@@ -34,6 +34,8 @@ public:
     guiMainWindow(QWidget *parent = Q_NULLPTR);
     ~guiMainWindow();
 
+    void                   closeEvent(QCloseEvent* e);
+
 public slots:
     void                   openHexFile();
     void                   saveHexFile();
