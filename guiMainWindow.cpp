@@ -218,7 +218,7 @@ guiMainWindow::saveHexFile()
     QStringList lines = text.split("\n", Qt::SkipEmptyParts);
 
     uint16_t address=0;
-    const int8_t blocksize = 16;
+    int8_t blocksize = 16;
     hexDataChunk chunk;
     bool ok=false;
 
@@ -230,6 +230,7 @@ guiMainWindow::saveHexFile()
 
         // split lines by spaces
         QStringList textlist = line.split(" ", Qt::SkipEmptyParts);
+        blocksize = textlist.size() - 1;
         for (auto token_iter = textlist.begin(); token_iter != textlist.end(); ++token_iter) {
 
             QString addr = *token_iter;

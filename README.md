@@ -56,11 +56,15 @@ This comes in 3 parts:
    read and check the EPROM contents against the loaded HEX file. You can save
    the hex file read from the EPROM to a file on the PC.
 
-7) During writing a progress bar indicated how far you are writing the EPROM,
+7) You can edit the hex data in the app, roight mouse button (RMB) gives a popup
+   menu with simple editing commands like copy, paste, cut, undo. No checking
+   is done that you are entering valid hex data!
+
+8) During writing a progress bar indicated how far you are writing the EPROM,
    also the orange LED will be lit and the green LED will flash periodically
    while writing.
 
-8) If the red LED is lit there is a buffer overflow. Try erasing the EPROM,
+9) If the red LED is lit there is a buffer overflow. Try erasing the EPROM,
    checking the serial link settings and try again.
 
 Any issues, please email keith@peardrop.co.uk
